@@ -1,0 +1,51 @@
+/*
+ * Visual language: a lit training mat at night. Chalk-white marks on a dark canvas,
+ * fight-broadcast numerals, one signal colour reserved for what is live or active.
+ */
+:root {
+  /* Color */
+  --bg: #0b0c0e; /* canvas: arena darkness */
+  --surface: #16181c; /* mat */
+  --surface-2: #1e2126; /* raised mat */
+  --line: rgba(236, 233, 227, 0.08);
+  --line-strong: rgba(236, 233, 227, 0.16);
+  --text: #ece9e3; /* chalk */
+  --text-muted: #8b9099; /* rope grey */
+  --text-faint: #50545c;
+  --accent: #ff4a1c; /* signal: live, active, primary action only */
+  --accent-ink: #0b0c0e;
+  --accent-soft: rgba(255, 74, 28, 0.16);
+  --chalk: #ece9e3;
+  --glass: rgba(11, 12, 14, 0.58);
+
+  /* Type */
+  --font-display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+  --font-body: 'Archivo Variable', 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Chivo Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --fs-label: 0.72rem;
+  --fs-body: 1rem;
+  --fs-lead: 1.2rem;
+  --fs-h2: clamp(2rem, 4vw, 3rem);
+  --fs-display: clamp(4.5rem, 12vw, 10.5rem);
+  --tracking-label: 0.12em;
+
+  /* Space (4px base) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 72px;
+  --gutter: clamp(20px, 4vw, 56px);
+
+  /* Shape, depth & motion */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --shadow-lift: 0 18px 40px -18px rgba(0, 0, 0, 0.7);
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --t-fast: 140ms;
+  --t-med: 320ms;
+  --t-slow: 600ms;
+}

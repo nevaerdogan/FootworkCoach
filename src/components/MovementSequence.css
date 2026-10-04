@@ -1,0 +1,73 @@
+.seq {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-5);
+}
+.seq-item {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  color: var(--text-faint);
+  transition: color var(--t-med) var(--ease-out), opacity var(--t-med) var(--ease-out);
+}
+.seq-mark {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  transition: background-color var(--t-med) var(--ease-out), border-color var(--t-med) var(--ease-out), transform var(--t-med) var(--ease-out);
+}
+.seq-mark .icon {
+  width: 14px;
+  height: 14px;
+}
+.seq-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.seq-item.is-current {
+  color: var(--text);
+}
+.seq-item.is-current .seq-mark {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  transform: scale(1.12);
+}
+.seq-item.is-done,
+.seq-item.is-correct {
+  color: var(--text-muted);
+}
+.seq-item.is-correct .seq-mark {
+  color: var(--accent);
+}
+.seq-item.is-wrong {
+  color: var(--text-muted);
+}
+.seq-item.is-wrong .seq-label {
+  text-decoration: line-through;
+  text-decoration-color: var(--accent);
+}
+
+.seq-sm {
+  gap: var(--s-1) var(--s-3);
+}
+.seq-sm .seq-mark {
+  width: 20px;
+  height: 20px;
+  border-width: 1px;
+}
+.seq-sm .seq-mark .icon {
+  width: 11px;
+  height: 11px;
+}
+.seq-sm .seq-label {
+  font-size: 0.85rem;
+}

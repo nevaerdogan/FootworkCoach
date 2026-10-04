@@ -1,0 +1,9 @@
+node_modules
+dist
+public/mediapipe/wasm
+.frames
+videos
+.claude
+.DS_Store
+*.log
+.env*

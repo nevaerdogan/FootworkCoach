@@ -1,0 +1,120 @@
+.fd {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.fd-tape line {
+  stroke: rgba(236, 233, 227, 0.18);
+  stroke-width: 3;
+  stroke-linecap: butt;
+}
+
+/* Chalk footprints */
+.fd-foot {
+  vector-effect: non-scaling-stroke;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+}
+.fd-foot.is-start {
+  fill: rgba(236, 233, 227, 0.14);
+  stroke: rgba(236, 233, 227, 0.35);
+}
+.fd-foot.is-past {
+  fill: rgba(236, 233, 227, 0.05);
+  stroke: rgba(236, 233, 227, 0.42);
+  stroke-dasharray: 2 2.5;
+}
+.fd-foot.is-live {
+  fill: var(--accent-soft);
+  stroke: var(--accent);
+  stroke-width: 1.8;
+}
+
+.fd-arrow {
+  fill: none;
+  stroke: rgba(236, 233, 227, 0.5);
+  stroke-width: 1.5;
+  stroke-dasharray: 1 5;
+  stroke-linecap: round;
+}
+.fd-mark.is-live .fd-arrow {
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+.fd-head {
+  fill: none;
+  stroke: rgba(236, 233, 227, 0.6);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.fd-head.is-live {
+  stroke: var(--accent);
+}
+
+.fd-dot {
+  fill: rgba(236, 233, 227, 0.55);
+}
+
+.fd-num-bg {
+  fill: var(--bg);
+  stroke: rgba(236, 233, 227, 0.35);
+  stroke-width: 1;
+}
+.fd-mark.is-live .fd-num-bg {
+  fill: var(--accent);
+  stroke: var(--accent);
+}
+.fd-num {
+  font: 600 10px var(--font-mono);
+  fill: var(--text);
+  text-anchor: middle;
+}
+.fd-mark.is-live .fd-num {
+  fill: var(--accent-ink);
+}
+
+.fd-punch {
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 1.4;
+}
+.fd-mark.is-live .fd-punch {
+  stroke: var(--accent);
+}
+.fd-punch-label {
+  font: 600 10px var(--font-mono);
+  fill: var(--text);
+  text-anchor: middle;
+}
+
+/* Marks arrive like chalk being laid down. */
+.fd-mark {
+  animation: fd-in 420ms var(--ease-out) both;
+}
+@keyframes fd-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+.fd-mark .fd-arrow {
+  animation: fd-draw 520ms var(--ease-out) both;
+}
+@keyframes fd-draw {
+  from {
+    opacity: 0;
+  }
+}
+
+.fd.is-compact .fd-foot {
+  stroke-width: 1;
+}
+.fd.is-compact .fd-arrow {
+  stroke-width: 1.2;
+}
+.fd.is-compact .fd-tape line {
+  stroke-width: 2;
+}

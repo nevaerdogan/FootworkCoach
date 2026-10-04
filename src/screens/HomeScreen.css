@@ -1,0 +1,291 @@
+.home {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: var(--s-5) var(--gutter) var(--s-5);
+  overflow: hidden;
+}
+
+.home-top,
+.home-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.home-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-3);
+  color: var(--text);
+}
+.home-brand .label {
+  color: var(--text);
+}
+.home-link {
+  transition: color var(--t-med) var(--ease-out);
+}
+.home-link:hover {
+  color: var(--accent);
+}
+
+.home-hero {
+  align-self: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.95fr);
+  align-items: center;
+  gap: clamp(32px, 6vw, 96px);
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.home-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-5);
+}
+.home-eyebrow {
+  color: var(--accent);
+}
+.home-title {
+  font-size: clamp(4.25rem, 9.5vw, 9.5rem);
+  line-height: 0.82;
+}
+.home-dot {
+  color: var(--accent);
+}
+.home-lead {
+  max-width: 40ch;
+  font-size: var(--fs-lead);
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+.home-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-5);
+  flex-wrap: wrap;
+  margin-top: var(--s-2);
+}
+
+.home-recent {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  align-items: end;
+  gap: var(--s-1) var(--s-5);
+  margin-top: var(--s-5);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--line);
+  max-width: 460px;
+}
+.home-recent .label {
+  grid-column: 1 / -1;
+}
+.home-recent-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  font-size: 0.9rem;
+}
+.home-recent-score {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.home-spark {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 3px;
+  height: 28px;
+}
+.home-spark i {
+  width: 5px;
+  border-radius: 1px;
+  background: var(--line-strong);
+}
+.home-spark i.is-last {
+  background: var(--accent);
+}
+
+/* The mat: a lit square of canvas where the drill is chalked out. */
+.home-mat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  padding: var(--s-5);
+  border-radius: 14px;
+  background:
+    radial-gradient(80% 70% at 50% 42%, rgba(236, 233, 227, 0.07), transparent 70%),
+    linear-gradient(180deg, #17191d, #111316);
+  border: 1px solid var(--line);
+  box-shadow:
+    inset 0 1px 0 rgba(236, 233, 227, 0.05),
+    0 40px 80px -40px rgba(0, 0, 0, 0.9);
+}
+.home-mat::before {
+  /* Inner tape border, like the edge of a training area. */
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border: 1px dashed rgba(236, 233, 227, 0.07);
+  border-radius: 8px;
+  pointer-events: none;
+}
+.home-mat-head {
+  display: flex;
+  justify-content: space-between;
+}
+.home-mat-count {
+  color: var(--text);
+}
+.home-mat-stage {
+  padding: var(--s-2) var(--s-4);
+  min-height: 300px;
+  display: grid;
+  place-items: center;
+}
+.home-mat-stage .fd {
+  max-height: 340px;
+}
+.home-mat-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--s-4);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--line);
+}
+.home-mat-name {
+  font-size: 2rem;
+  animation: screen-in var(--t-slow) var(--ease-out) both;
+}
+.home-mat-steps {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--s-1) var(--s-3);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.home-mat-steps li {
+  transition: color var(--t-med) var(--ease-out);
+}
+.home-mat-steps .is-done {
+  color: var(--text-muted);
+}
+.home-mat-steps .is-live {
+  color: var(--accent);
+}
+
+.home-copy > * {
+  animation: screen-in var(--t-slow) var(--ease-out) both;
+}
+.home-copy > :nth-child(2) {
+  animation-delay: 60ms;
+}
+.home-copy > :nth-child(3) {
+  animation-delay: 120ms;
+}
+.home-copy > :nth-child(4) {
+  animation-delay: 180ms;
+}
+.home-mat {
+  animation: screen-in 800ms var(--ease-out) 200ms both;
+}
+
+@media (max-width: 960px) {
+  .home {
+    overflow-y: auto;
+  }
+  .home-hero {
+    grid-template-columns: 1fr;
+    margin: var(--s-6) 0;
+  }
+  .home-mat-stage {
+    min-height: 200px;
+  }
+}
+
+/* ---------- Motion ---------- */
+.home-hero {
+  perspective: 1400px;
+}
+.home-mat {
+  --rx: 0deg;
+  --ry: 0deg;
+  --mx: 50%;
+  --my: 40%;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transform-style: preserve-3d;
+  transition:
+    transform 500ms var(--ease-out),
+    box-shadow 500ms var(--ease-out);
+  animation: mat-in 1100ms cubic-bezier(0.2, 0.8, 0.1, 1) 250ms both;
+}
+.home-mat:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(236, 233, 227, 0.06),
+    0 50px 90px -40px rgba(0, 0, 0, 0.95),
+    0 0 0 1px rgba(255, 74, 28, 0.12);
+}
+@keyframes mat-in {
+  from {
+    opacity: 0;
+    transform: perspective(1400px) rotateX(18deg) translateY(40px) scale(0.96);
+    filter: blur(10px);
+  }
+}
+.home-mat-light {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(420px circle at var(--mx) var(--my), rgba(236, 233, 227, 0.08), transparent 60%);
+  opacity: 0;
+  transition: opacity 400ms var(--ease-out);
+}
+.home-mat:hover .home-mat-light {
+  opacity: 1;
+}
+.home-title {
+  animation: none;
+}
+.home-copy > .home-eyebrow {
+  animation: eyebrow-in 700ms var(--ease-out) both;
+}
+@keyframes eyebrow-in {
+  from {
+    opacity: 0;
+    letter-spacing: 0.4em;
+  }
+}
+.home-dot {
+  display: inline-block;
+  animation: dot-pop 600ms cubic-bezier(0.3, 1.6, 0.5, 1) 900ms both;
+}
+@keyframes dot-pop {
+  from {
+    transform: scale(0);
+  }
+}
+.brand-mark path:last-child {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: brand-step 2.8s var(--ease-out) 1.2s infinite;
+}
+@keyframes brand-step {
+  0%,
+  70%,
+  100% {
+    translate: 0 0;
+  }
+  80% {
+    translate: 1px -2px;
+  }
+}

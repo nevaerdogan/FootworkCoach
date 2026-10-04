@@ -1,0 +1,254 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  /* A single overhead light on the mat, plus fine canvas grain. */
+  background:
+    radial-gradient(110% 70% at 50% -12%, rgba(236, 233, 227, 0.06), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* ---------- Typography ---------- */
+/* Labels read like a fight-broadcast lower third: monospaced, tracked, quiet. */
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 0.86;
+  letter-spacing: 0.005em;
+}
+
+.h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-h2);
+  text-transform: uppercase;
+  line-height: 0.95;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-3);
+  height: 54px;
+  padding: 0 var(--s-6);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  transition:
+    transform var(--t-fast) var(--ease-out),
+    background-color var(--t-med) var(--ease-out),
+    color var(--t-med) var(--ease-out),
+    opacity var(--t-med) var(--ease-out);
+}
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.btn-primary {
+  background: linear-gradient(180deg, #ff5a2e, var(--accent));
+  color: var(--accent-ink);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 10px 28px -12px rgba(255, 74, 28, 0.65);
+}
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, #ff6a40, #ff5426);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    0 14px 34px -12px rgba(255, 74, 28, 0.8);
+}
+.btn-primary:disabled {
+  background: var(--surface-2);
+  color: var(--text-faint);
+  box-shadow: none;
+  cursor: default;
+}
+.btn-ghost {
+  color: var(--text);
+  padding: 0 var(--s-2);
+}
+.btn-ghost:hover {
+  color: var(--accent);
+}
+.btn .icon {
+  transition: transform var(--t-med) var(--ease-out);
+}
+.btn:hover:not(:disabled) .icon-arrowRight {
+  transform: translateX(4px);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+/* ---------- Screen transitions ---------- */
+.screen {
+  position: fixed;
+  inset: 0;
+  animation: screen-in var(--t-slow) var(--ease-out) both;
+}
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.reveal {
+  animation: screen-in var(--t-slow) var(--ease-out) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+/* ---------- Screen transitions (View Transitions API) ---------- */
+::view-transition-old(root) {
+  animation: vt-out 280ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+::view-transition-new(root) {
+  animation: vt-in 520ms cubic-bezier(0.2, 0.7, 0.2, 1) 60ms both;
+}
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    transform: scale(0.985);
+    filter: blur(6px);
+  }
+}
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: scale(1.015);
+    filter: blur(8px);
+  }
+}
+
+/* Primary button: a sheen of light passes over it on hover. */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.38) 48%, transparent 66%);
+  transform: translateX(-120%);
+}
+.btn-primary:hover:not(:disabled)::after {
+  transform: translateX(120%);
+  transition: transform 700ms var(--ease-out);
+}
+.btn-ghost {
+  position: relative;
+}
+.btn-ghost::before {
+  content: '';
+  position: absolute;
+  left: var(--s-2);
+  right: var(--s-2);
+  bottom: 12px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--t-med) var(--ease-out);
+}
+.btn-ghost:hover:not(:disabled)::before {
+  transform: scaleX(1);
+}
+.btn-ghost[aria-label]::before {
+  display: none;
+}
+
+/* Masked line reveal for display headlines. */
+.reveal-lines > span {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.04em;
+}
+.reveal-lines > span > span {
+  display: inline-block;
+  animation: line-rise 900ms cubic-bezier(0.2, 0.8, 0.1, 1) both;
+}
+.reveal-lines > span:nth-child(2) > span {
+  animation-delay: 90ms;
+}
+.reveal-lines > span:nth-child(3) > span {
+  animation-delay: 180ms;
+}
+@keyframes line-rise {
+  from {
+    transform: translateY(105%);
+  }
+}
+
+/* While the opening sequence plays, the screen underneath waits to run its own entrance. */
+.app.is-intro *,
+.app.is-intro *::before,
+.app.is-intro *::after {
+  animation-play-state: paused !important;
+}

@@ -1,0 +1,93 @@
+.traj {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.traj svg {
+  width: 100%;
+  max-height: 280px;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px) 0 0 / 24px 24px;
+  border-radius: var(--radius);
+}
+.traj-camera {
+  fill: var(--text-faint);
+  font: 600 9px var(--font-body);
+  letter-spacing: 0.16em;
+  text-anchor: middle;
+}
+.traj-seg {
+  transition: opacity var(--t-med) var(--ease-out);
+}
+.traj-seg.is-dim {
+  opacity: 0.25;
+}
+.traj-left,
+.traj-right {
+  fill: none;
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.traj-left {
+  stroke: var(--text);
+}
+.traj-right {
+  stroke: var(--text-muted);
+  stroke-dasharray: 5 4;
+}
+.traj-expected {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 4;
+  opacity: 0.8;
+}
+.traj-arrowhead {
+  fill: var(--accent);
+}
+.traj-start {
+  fill: var(--bg);
+  stroke: var(--text-muted);
+  stroke-width: 1.5;
+}
+.traj-end {
+  fill: var(--text);
+}
+.traj-seg.is-wrong .traj-end,
+.traj-seg.is-missed .traj-start {
+  fill: var(--bg);
+  stroke: var(--accent);
+  stroke-width: 1.5;
+}
+.traj-num {
+  fill: var(--text-muted);
+  font: 600 10px var(--font-display);
+}
+.traj-seg.is-on .traj-num {
+  fill: var(--accent);
+}
+
+.traj-legend {
+  display: flex;
+  gap: var(--s-5);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.traj-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.traj-legend i {
+  width: 16px;
+  height: 0;
+  border-top: 2px solid var(--text);
+}
+.traj-legend i.is-right {
+  border-top: 2px dashed var(--text-muted);
+}
+.traj-legend i.is-expected {
+  border-top: 1.5px dashed var(--accent);
+}

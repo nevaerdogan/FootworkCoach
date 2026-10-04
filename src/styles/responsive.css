@@ -1,0 +1,415 @@
+/*
+ * Responsive layer, loaded last. Breakpoints:
+ *   ≤ 900px  tablets / small laptops (single-column pages)
+ *   ≤ 640px  phones (portrait)
+ *   short    phones in landscape (height ≤ 500px)
+ * Plus: touch devices get no hover-only effects, and every edge respects the notch (safe areas).
+ */
+
+/* ---------- Safe areas (notch, home indicator) ---------- */
+.home,
+.page,
+.session-overlay {
+  padding-left: max(var(--gutter), env(safe-area-inset-left));
+  padding-right: max(var(--gutter), env(safe-area-inset-right));
+}
+.session-overlay {
+  padding-top: max(var(--s-5), env(safe-area-inset-top));
+  padding-bottom: max(var(--gutter), env(safe-area-inset-bottom));
+}
+
+/* ---------- Touch: no hover-only effects (they would stick after a tap) ---------- */
+@media (hover: none) {
+  .home-mat,
+  .home-mat:hover {
+    transform: none;
+  }
+  .home-mat-light {
+    display: none;
+  }
+  .level:hover,
+  .level:hover .level-thumb {
+    transform: none;
+  }
+  .btn-primary:hover:not(:disabled)::after {
+    transform: translateX(-120%);
+    transition: none;
+  }
+  .btn-ghost:hover:not(:disabled)::before {
+    transform: scaleX(0);
+  }
+  .level:active {
+    background: rgba(255, 255, 255, 0.03);
+  }
+}
+
+/* ---------- Tablets ---------- */
+@media (max-width: 900px) {
+  /* The demo never scrolls: keep its grid so the stage can fill the height. */
+  .page.demo {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    overflow: hidden;
+  }
+  .page.demo .page-bottom {
+    position: static;
+    background: none;
+  }
+  .training-hud {
+    grid-template-columns: 1fr auto;
+  }
+  .training-hud .hud-current {
+    grid-column: 1 / -1;
+  }
+  .wk-actions {
+    justify-content: flex-end;
+  }
+}
+
+/* ---------- Phones ---------- */
+@media (max-width: 640px) {
+  :root {
+    --gutter: 18px;
+  }
+
+  /* Home */
+  .home {
+    padding-top: max(var(--s-4), env(safe-area-inset-top));
+    padding-bottom: max(var(--s-4), env(safe-area-inset-bottom));
+  }
+  .home-hero {
+    margin: var(--s-5) 0;
+    gap: var(--s-6);
+  }
+  .home-title {
+    font-size: clamp(3.4rem, 17vw, 5rem);
+  }
+  .home-lead {
+    font-size: 1.02rem;
+  }
+  .home-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--s-1);
+  }
+  .home-actions .btn {
+    width: 100%;
+  }
+  .home-mat {
+    padding: var(--s-4);
+  }
+  .home-mat-stage {
+    min-height: 210px;
+    padding: 0;
+  }
+  .home-mat-caption {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s-2);
+  }
+  .home-mat-steps {
+    justify-content: flex-start;
+  }
+  .home-mat-name {
+    font-size: 1.6rem;
+  }
+  .home-foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s-1);
+  }
+  .home-recent {
+    max-width: none;
+  }
+
+  /* Pages: header, sticky action bar */
+  .page {
+    padding-top: max(var(--s-3), env(safe-area-inset-top));
+  }
+  .page-top {
+    gap: var(--s-3);
+    min-height: 48px;
+  }
+  .tabs {
+    gap: var(--s-4);
+  }
+  .tab {
+    font-size: 1.05rem;
+  }
+  .page-bottom {
+    gap: var(--s-2);
+    padding-bottom: max(var(--s-4), env(safe-area-inset-bottom));
+  }
+  .page-bottom .btn-primary {
+    flex: 1;
+  }
+  .page-bottom .btn {
+    padding: 0 var(--s-4);
+  }
+  .wk-hint {
+    display: none;
+  }
+
+  /* Workout / round / drill rows: name left, chalk thumbnail right */
+  .level,
+  .level-drill {
+    grid-template-columns: 1fr 92px;
+    gap: var(--s-2) var(--s-3);
+    padding: var(--s-4) var(--s-2);
+  }
+  .level-index {
+    display: none;
+  }
+  .level-thumb {
+    width: 92px;
+    height: 76px;
+  }
+  .level-thumb .fd {
+    max-height: 62px;
+  }
+  .level-name .seq {
+    display: none;
+  }
+  .level-name .display,
+  .level-drill .level-name .display {
+    font-size: 1.65rem;
+  }
+  .level-name .muted {
+    font-size: 0.85rem;
+  }
+  .level-blocks {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 2px var(--s-3);
+  }
+
+  /* Builder */
+  .builder-moves {
+    grid-template-columns: 1fr 1fr;
+  }
+  .move-tile {
+    height: 54px;
+    font-size: 0.92rem;
+    padding: 0 var(--s-3);
+    grid-template-columns: 18px 1fr 14px;
+    gap: var(--s-2);
+  }
+
+  /* Results: bar under the name so nothing is cramped */
+  .results-score {
+    font-size: clamp(4.5rem, 24vw, 6.5rem);
+  }
+  .results-list li {
+    grid-template-columns: 26px 18px 1fr 52px;
+    grid-template-rows: auto auto;
+    row-gap: 6px;
+    height: auto;
+    min-height: 0;
+    padding: var(--s-3) 0;
+  }
+  .results-list li .results-bar {
+    grid-column: 3 / 4;
+    grid-row: 2;
+  }
+  .results-list.wr-list li {
+    grid-template-columns: 26px 1fr 60px;
+  }
+  .results-list.wr-list li .results-bar {
+    grid-column: 2 / 3;
+  }
+  .results-name {
+    font-size: 1.05rem;
+    flex-wrap: wrap;
+  }
+  .wr-stats {
+    grid-template-columns: repeat(3, auto);
+    gap: var(--s-3) var(--s-5);
+  }
+  .wr-stats dd {
+    font-size: 1.35rem;
+  }
+  .traj svg {
+    max-height: 230px;
+  }
+
+  /* Demo */
+  .demo-title {
+    font-size: clamp(2.2rem, 11vw, 3.2rem);
+    gap: var(--s-3);
+  }
+  .demo-caption {
+    min-height: 84px;
+    text-align: center;
+  }
+  .seq {
+    gap: var(--s-1) var(--s-3);
+  }
+  .seq-label {
+    font-size: 0.88rem;
+  }
+  .seq-mark {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Camera session */
+  .session-steps {
+    gap: var(--s-3);
+  }
+  .session-steps .label {
+    display: none;
+  }
+  .session-steps li.is-active .label {
+    display: inline;
+  }
+  .setup-checks .label {
+    font-size: 0.62rem;
+  }
+  .practice-gauge {
+    width: min(200px, 46vw);
+    padding: var(--s-2) var(--s-3);
+  }
+  .practice-gauge-value {
+    font-size: 1.8rem;
+  }
+  .practice-move {
+    font-size: clamp(2.8rem, 15vw, 4rem);
+  }
+  .training-toast {
+    padding: var(--s-3) var(--s-4);
+  }
+  .training-toast .h2 {
+    font-size: 1.6rem;
+  }
+  .hud-move {
+    font-size: clamp(2.2rem, 11vw, 3rem);
+  }
+  .wk-move {
+    padding: var(--s-4) var(--s-5);
+  }
+  .wk-move-name {
+    font-size: clamp(3rem, 16vw, 4.5rem);
+  }
+  .wk-hud {
+    gap: var(--s-3) var(--s-4);
+  }
+  .wk-actions .btn {
+    height: 44px;
+    padding: 0 var(--s-2);
+    font-size: 1rem;
+  }
+  .wk-overlay-time {
+    font-size: clamp(5.5rem, 30vw, 8rem);
+  }
+  .wk-overlay .h2 {
+    font-size: 1.7rem;
+    padding: 0 var(--gutter);
+  }
+
+  /* Intro + stinger */
+  .intro-brand {
+    flex-direction: column;
+    text-align: center;
+  }
+  .intro-name {
+    align-items: center;
+  }
+  .intro-name .display {
+    font-size: clamp(2.4rem, 12vw, 3.2rem);
+  }
+  .stinger-title {
+    flex-direction: column;
+    text-align: center;
+    padding: 0 var(--gutter);
+  }
+  .stinger-text .display {
+    font-size: clamp(2.6rem, 13vw, 3.6rem);
+  }
+}
+
+/* ---------- Phones in landscape: very little height ---------- */
+@media (max-height: 500px) and (orientation: landscape) {
+  .session-overlay {
+    padding-top: max(var(--s-2), env(safe-area-inset-top));
+    padding-bottom: max(var(--s-3), env(safe-area-inset-bottom));
+  }
+  .session-steps .label {
+    display: none;
+  }
+  .training-hud,
+  .wk-hud {
+    grid-template-columns: 1fr auto auto auto;
+    gap: var(--s-4);
+    padding-top: var(--s-2);
+  }
+  .training-hud .hud-current,
+  .wk-clock {
+    grid-column: auto;
+  }
+  .hud-move {
+    font-size: 2rem;
+  }
+  .wk-time {
+    font-size: 2.6rem;
+  }
+  .wk .hud-stat .display,
+  .hud-stat .display {
+    font-size: 1.6rem;
+  }
+  .wk-top {
+    margin-top: var(--s-1);
+  }
+  .wk-block {
+    font-size: 1.4rem;
+  }
+  .wk-move {
+    padding: var(--s-2) var(--s-5);
+  }
+  .wk-move-name {
+    font-size: 3rem;
+  }
+  .wk-overlay-time {
+    font-size: 6rem;
+  }
+  .session-bottom {
+    gap: var(--s-4);
+  }
+  .practice-callout {
+    min-height: 0;
+  }
+  .practice-move {
+    font-size: 3rem;
+  }
+  .countdown-beat.is-number,
+  .countdown-beat.is-go {
+    font-size: 9rem;
+  }
+  .home-hero {
+    margin: var(--s-4) 0;
+  }
+  .demo-caption {
+    min-height: 64px;
+    padding-bottom: 0;
+  }
+  .demo-title {
+    font-size: 2.2rem;
+  }
+  .page-bottom {
+    padding-top: var(--s-2);
+    padding-bottom: max(var(--s-2), env(safe-area-inset-bottom));
+  }
+  .page-bottom .btn {
+    height: 44px;
+  }
+  .results-score {
+    font-size: 5rem;
+  }
+}
+
+/* Portrait demo: the stage fills its row and the SVG crops the empty sides. */
+.demo-stage .demo-svg.is-portrait {
+  height: 100%;
+  max-height: none;
+}

@@ -1,0 +1,95 @@
+.demo-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.demo-floor line {
+  stroke: rgba(236, 233, 227, 0.06);
+  stroke-width: 1;
+}
+.demo-tape line {
+  stroke: rgba(236, 233, 227, 0.32);
+  stroke-width: 4;
+}
+
+.demo-camera rect {
+  fill: none;
+  stroke: var(--text-faint);
+  stroke-width: 1.5;
+}
+.demo-camera text {
+  fill: var(--text-faint);
+  font: 600 11px var(--font-body);
+  letter-spacing: 0.16em;
+  text-anchor: middle;
+}
+
+/* Fighter: neutral skin, charcoal kit with a rim light so it reads on the dark stage. */
+.fighter-shadow {
+  fill: rgba(0, 0, 0, 0.45);
+  filter: blur(3px);
+}
+.fighter-skin {
+  fill: url(#fighter-skin);
+}
+.fighter-top {
+  fill: url(#fighter-kit);
+  stroke: rgba(255, 255, 255, 0.24);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+.fighter-shorts {
+  fill: url(#fighter-kit);
+  stroke: rgba(255, 255, 255, 0.22);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+.fighter-waistband {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+.fighter-glove {
+  fill: url(#fighter-glove);
+  stroke: rgba(0, 0, 0, 0.3);
+  stroke-width: 1;
+}
+.fighter-shoe {
+  fill: var(--text);
+  transition: fill var(--t-fast) linear;
+}
+.fighter-shoe.is-moving {
+  fill: var(--accent);
+}
+
+.demo-marker-start {
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-linecap: round;
+}
+.demo-marker-end {
+  stroke: var(--accent-soft);
+  stroke-linecap: round;
+}
+.demo-trail {
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-dasharray: 2 6;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+.demo-arrow {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.demo-pivot {
+  fill: var(--accent);
+}
+.fighter-glove.is-moving {
+  fill: url(#fighter-glove-live);
+}
