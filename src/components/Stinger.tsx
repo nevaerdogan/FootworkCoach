@@ -7,13 +7,15 @@ interface Props {
   play: string | number | null;
   title: string;
   kicker?: string;
+  /** Keep the title's own casing (e.g. a handle) instead of the uppercase display style. */
+  keepCase?: boolean;
 }
 
 /**
  * Fight-broadcast stinger: angled bands sweep across the screen with a title between them.
  * Purely decorative (pointer-events: none) and removed from the DOM when finished.
  */
-export function Stinger({ play, title, kicker }: Props) {
+export function Stinger({ play, title, kicker, keepCase }: Props) {
   const [run, setRun] = useState<{ key: string | number; title: string; kicker?: string } | null>(null);
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export function Stinger({ play, title, kicker }: Props) {
 
   if (!run) return null;
   return (
-    <div className="stinger" key={run.key} aria-hidden="true">
+    <div className={keepCase ? 'stinger is-keep-case' : 'stinger'} key={run.key} aria-hidden="true">
       <i className="stinger-band stinger-band-a" />
       <i className="stinger-band stinger-band-b" />
       <i className="stinger-band stinger-band-c" />

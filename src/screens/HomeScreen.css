@@ -289,3 +289,25 @@
     translate: 1px -2px;
   }
 }
+
+/* ---------- Logo easter egg: each tap twitches harder ---------- */
+.home-brand {
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.home-brand-mark {
+  display: inline-flex;
+}
+.home-brand-mark.is-tapped {
+  animation: brand-tap 280ms var(--ease-out);
+}
+@keyframes brand-tap {
+  40% {
+    transform: scale(calc(1 + var(--tap) * 0.06)) rotate(calc(var(--tap) * -6deg));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-brand-mark.is-tapped {
+    animation: none;
+  }
+}

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { BrandMark } from '../components/BrandMark';
 import { FootworkDiagram } from '../components/FootworkDiagram';
 import { Icon } from '../components/Icon';
+import { Stinger } from '../components/Stinger';
 import { MOVEMENTS } from '../movements';
 import { DRILLS } from '../training/combinations';
 import type { SessionRecord } from '../training/history';
@@ -17,6 +18,9 @@ interface Props {
 /** Drills the hero diagram cycles through. */
 const SHOWCASE = ['box', 'diamond', 'l-step', 'in-out'].map((id) => DRILLS.find((d) => d.id === id)!);
 const STEP_MS = 850;
+/** Easter egg: this many quick taps on the logo reveal the signature. */
+const SIGNATURE_TAPS = 5;
+const TAP_GAP_MS = 600;
 
 function timeAgo(iso: string, now = Date.now()): string {
   const min = Math.round((now - new Date(iso).getTime()) / 60000);
@@ -55,6 +59,21 @@ export function HomeScreen({ history, onStart, onCustom, onPractice }: Props) {
     el.style.setProperty('--rx', `${((0.5 - y) * 6).toFixed(2)}deg`);
     el.style.setProperty('--ry', `${((x - 0.5) * 8).toFixed(2)}deg`);
   };
+  // Tapping the logo makes it twitch; enough taps in a row play the signature stinger.
+  const [taps, setTaps] = useState(0);
+  const [signature, setSignature] = useState<number | null>(null);
+  const lastTap = useRef(0);
+  const onBrandTap = () => {
+    const now = Date.now();
+    const count = now - lastTap.current < TAP_GAP_MS ? taps + 1 : 1;
+    lastTap.current = now;
+    if (count >= SIGNATURE_TAPS) {
+      setTaps(0);
+      setSignature(now);
+      navigator.vibrate?.(30);
+    } else setTaps(count);
+  };
+
   const onMatLeave = () => {
     const el = matRef.current;
     if (!el) return;
@@ -64,9 +83,16 @@ export function HomeScreen({ history, onStart, onCustom, onPractice }: Props) {
 
   return (
     <main className="screen home">
+      <Stinger play={signature} title="nevamindd" kicker="In the red corner" keepCase />
       <header className="home-top">
-        <span className="home-brand">
-          <BrandMark />
+        <span className="home-brand" onClick={onBrandTap}>
+          <span
+            className={taps ? 'home-brand-mark is-tapped' : 'home-brand-mark'}
+            key={taps}
+            style={{ '--tap': taps } as React.CSSProperties}
+          >
+            <BrandMark />
+          </span>
           <span className="label">Footwork Coach</span>
         </span>
         <button className="label home-link" onClick={onPractice}>

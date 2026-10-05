@@ -61,6 +61,9 @@
   font-size: clamp(3rem, 8vw, 6.5rem);
   line-height: 0.85;
 }
+.stinger.is-keep-case .stinger-text .display {
+  text-transform: none;
+}
 .stinger-kicker {
   color: var(--accent);
 }
