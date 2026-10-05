@@ -2,6 +2,8 @@
 
 A browser-based kickboxing footwork trainer. Watch a drill, perform it in front of your camera, and get an objective breakdown of what you did: direction, distance, timing and rhythm.
 
+**Try it:** [footworkcoach.pages.dev](https://footworkcoach.pages.dev)
+
 Everything runs on your device. The camera stream is never uploaded, there is no backend, and the analysis is deterministic geometry — no machine-learning model beyond pose estimation, and no LLM.
 
 ## Features
@@ -94,7 +96,7 @@ Available in `npm run dev` only:
 
 ## Deployment
 
-The app is a static site. Any static host works; it is deployed on **Cloudflare Pages** with:
+The app is a static site, so any static host works. It is live at **[footworkcoach.pages.dev](https://footworkcoach.pages.dev)**, deployed on Cloudflare Pages from GitHub on every push to `main`:
 
 - Build command: `npm run build`
 - Output directory: `dist`
