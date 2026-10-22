@@ -47,3 +47,31 @@ export function assessReadiness(frame: PoseFrame | null, cfg = READINESS_CONFIG)
 export function readinessKey(r: Readiness): string {
   return r.guidance + BODY_PARTS.map((p) => (r.parts[p.id] ? 1 : 0)).join('');
 }
+
+/**
+ * Readiness for a conditioning exercise. `parts` lists what must be in frame while the athlete
+ * stands at the spot. In a side view only one side of each pair is clearly visible, so a part
+ * counts when either of its landmarks is; a front view needs both.
+ */
+export function assessExerciseReadiness(
+  frame: PoseFrame | null,
+  required: BodyPart[],
+  view: 'side' | 'front',
+  cfg = READINESS_CONFIG,
+): Readiness {
+  const parts = {} as Record<BodyPart, boolean>;
+  for (const part of BODY_PARTS) {
+    const visible = (n: LandmarkName) => !!frame && isLandmarkVisible(frame[n], cfg);
+    parts[part.id] = view === 'side' ? part.landmarks.some(visible) : part.landmarks.every(visible);
+  }
+  const ready = required.every((id) => parts[id]);
+  const upper = parts.shoulders || parts.hips;
+
+  let guidance: Guidance;
+  if (ready) guidance = 'READY';
+  else if (!frame || !upper) guidance = 'NO_PERSON';
+  else if ((required.includes('ankles') && !parts.ankles) || (required.includes('knees') && !parts.knees)) guidance = 'STEP_BACK';
+  else guidance = 'ADJUST';
+
+  return { parts, guidance, ready };
+}

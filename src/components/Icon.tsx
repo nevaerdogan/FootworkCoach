@@ -24,6 +24,11 @@ const PATHS = {
   play: 'M8 5.5v13l10.5-6.5z',
   rotateLeft: 'M4.6 9A8 8 0 1 1 4 13M4 4v5h5',
   rotateRight: 'M19.4 9A8 8 0 1 0 20 13M20 4v5h-5',
+  pushup: 'M3 19h18M6 19l4-6h7l3 4M20 10.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4',
+  situp: 'M3 20h18M17 20l-3-6-5 2M9 16l3-7M14 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4',
+  rope: 'M12 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4M12 6v7M9 21l3-8 3 8M9 10l3 3 3-3M4 11c1 7 15 7 16 0',
+  timer: 'M12 21a8 8 0 1 0 0-16 8 8 0 0 0 0 16M12 9v4l3 2M10 2h4',
+  infinity: 'M7 15a3 3 0 1 1 0-6c3 0 7 6 10 6a3 3 0 1 0 0-6c-3 0-7 6-10 6z',
 } as const;
 
 export type IconName = keyof typeof PATHS;

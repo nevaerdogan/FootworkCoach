@@ -4,6 +4,7 @@ import { loadPoseEstimator, reportFrameError } from '../pose/PoseEstimator';
 import type { PoseFrame } from '../pose/types';
 import { Icon } from './Icon';
 import { DebugPanel, isDebugMode } from './DebugPanel';
+import { useWakeLock } from './useWakeLock';
 import './CameraView.css';
 
 export type CameraStatus = 'loading' | 'live' | 'denied' | 'unavailable' | 'insecure' | 'error';
@@ -43,6 +44,8 @@ export function CameraView({ children }: Props) {
   }, []);
   const [status, setStatus] = useState<CameraStatus>('loading');
   const [attempt, setAttempt] = useState(0);
+  // The phone may lie untouched on the floor for minutes: don't let the screen sleep.
+  useWakeLock();
 
   useEffect(() => {
     let cancelled = false;
@@ -72,15 +75,17 @@ export function CameraView({ children }: Props) {
     };
 
     (async () => {
-      // Dev only: ?synthetic replaces the webcam with scripted poses through the same pipeline.
-      if (import.meta.env.DEV && new URLSearchParams(location.search).has('synthetic')) {
+      // Dev only: ?synthetic replaces the webcam with scripted poses through the same pipeline
+      // (?synthetic=pushup | situp | jump for the rep counters).
+      const synthetic = import.meta.env.DEV ? new URLSearchParams(location.search).get('synthetic') : null;
+      if (synthetic !== null) {
         const canvas = canvasRef.current;
         if (!canvas) return;
         canvas.width = 1280;
         canvas.height = 720;
         const { startSyntheticFeed } = await import('../dev/syntheticFeed');
         if (cancelled) return;
-        stopEstimator = startSyntheticFeed(makeDispatch(canvas.getContext('2d')!, styleFor(canvas)));
+        stopEstimator = startSyntheticFeed(makeDispatch(canvas.getContext('2d')!, styleFor(canvas)), synthetic);
         setStatus('live');
         return;
       }

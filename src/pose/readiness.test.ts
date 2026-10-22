@@ -51,3 +51,27 @@ describe('assessReadiness', () => {
     expect(f.leftAnkle.x).toBeGreaterThan(f.rightAnkle.x);
   });
 });
+
+describe('assessExerciseReadiness', () => {
+  it('side view: a part counts when either side is visible; a front view needs both', async () => {
+    const { assessExerciseReadiness } = await import('./readiness');
+    const { sitUpFrame } = await import('../test/repFixtures');
+    // Lying side on: the far-side joints report low visibility.
+    const frame = sitUpFrame(0, 5);
+    const side = assessExerciseReadiness(frame, ['shoulders', 'hips', 'knees', 'ankles'], 'side');
+    expect(side.ready).toBe(true);
+    expect(side.guidance).toBe('READY');
+    const front = assessExerciseReadiness(frame, ['shoulders', 'hips', 'knees', 'ankles'], 'front');
+    expect(front.ready).toBe(false);
+  });
+
+  it('only the required parts matter, and missing legs ask to step back', async () => {
+    const { assessExerciseReadiness } = await import('./readiness');
+    const frame = toPoseFrame(standingRaw({ [LANDMARK_INDEX.leftAnkle]: { visibility: 0.2 }, [LANDMARK_INDEX.rightAnkle]: { visibility: 0.2 } }), 0);
+    expect(assessExerciseReadiness(frame, ['hips', 'knees'], 'front').ready).toBe(true);
+    const r = assessExerciseReadiness(frame, ['hips', 'knees', 'ankles'], 'front');
+    expect(r.ready).toBe(false);
+    expect(r.guidance).toBe('STEP_BACK');
+    expect(assessExerciseReadiness(null, ['hips'], 'front').guidance).toBe('NO_PERSON');
+  });
+});

@@ -11,6 +11,10 @@ export interface SessionRecord {
   /** Set for timed workouts. */
   workoutId?: string;
   workoutName?: string;
+  /** Set for rep-counted conditioning sessions (push-ups, sit-ups, rope): `reps` is the total. */
+  kind?: 'conditioning';
+  conditioningKey?: string;
+  reps?: number;
   combination: MovementId[];
   overallScore: number;
   movementScores: { id: MovementId; score: number; status: MovementStatus }[];
@@ -79,5 +83,25 @@ const sameCombo = (a: MovementId[], b: MovementId[]) => a.length === b.length &&
 
 /** Most recent earlier session with the same combination, for "vs last time". */
 export function previousFor(combination: MovementId[], history: SessionRecord[]): SessionRecord | null {
-  return history.find((r) => !r.workoutId && sameCombo(r.combination, combination)) ?? null;
+  return history.find((r) => !r.workoutId && !r.kind && sameCombo(r.combination, combination)) ?? null;
+}
+
+/** Conditioning session (reps counted): the total is the headline number, there is no score. */
+export function toConditioningRecord(key: string, name: string, reps: number, durationMs: number, date = new Date()): SessionRecord {
+  return {
+    date: date.toISOString(),
+    kind: 'conditioning',
+    conditioningKey: key,
+    workoutName: name,
+    reps,
+    combination: [],
+    overallScore: 0,
+    movementScores: [],
+    timings: { totalMs: Math.round(durationMs), reactionMs: [], durationMs: [] },
+  };
+}
+
+/** Most recent earlier conditioning session with the same plan, for "vs last time". */
+export function previousConditioning(key: string, history: SessionRecord[]): SessionRecord | null {
+  return history.find((r) => r.kind === 'conditioning' && r.conditioningKey === key) ?? null;
 }

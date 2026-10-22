@@ -413,3 +413,124 @@
   height: 100%;
   max-height: none;
 }
+
+/* ---------- Rep counting (push-ups, sit-ups, rope) ---------- */
+@media (max-width: 900px) {
+  .rep-hud,
+  .rep.is-timed .rep-hud {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s-4);
+  }
+  .rep-hud .wk-clock {
+    grid-column: 1 / -1;
+  }
+  .rep-hud .wk-actions {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    justify-content: space-between;
+  }
+  .rep-blocks {
+    display: none;
+  }
+}
+@media (max-width: 640px) {
+  .rep-dial {
+    width: min(62vw, 250px);
+  }
+  .rep-number {
+    font-size: clamp(4rem, 30vw, 7rem);
+  }
+  .rep-hud {
+    gap: var(--s-3) var(--s-4);
+  }
+  .rep-hud .wk-actions .btn {
+    height: 44px;
+    font-size: 1rem;
+  }
+  .rep-hud .btn-primary {
+    padding: 0 var(--s-4);
+  }
+  .rep-toast-slot {
+    min-height: 56px;
+  }
+  .rep-toast-slot .h2 {
+    font-size: 1.5rem;
+  }
+  .cond-intro {
+    padding: 0 var(--s-2) var(--s-3);
+    font-size: 0.9rem;
+  }
+  .cond-rounds {
+    flex-wrap: wrap;
+    gap: var(--s-3) var(--s-4);
+    padding: var(--s-4) var(--s-2);
+  }
+  .cond-total {
+    width: 100%;
+    font-size: 0.85rem;
+  }
+  .rep-thumb {
+    width: 92px;
+    height: 76px;
+  }
+  .rep-thumb .icon {
+    width: 34px;
+    height: 34px;
+  }
+  .rep-setup-how {
+    font-size: 0.85rem;
+  }
+  .wr-stats {
+    grid-template-columns: repeat(3, auto);
+  }
+}
+
+/* Phone lying on its side on the floor (push-ups, sit-ups): count and HUD side by side. */
+@media (max-height: 500px) and (orientation: landscape) {
+  .rep-top {
+    margin-top: var(--s-1);
+  }
+  .rep-exercise {
+    font-size: 1.3rem;
+  }
+  .rep-blocks {
+    display: none;
+  }
+  .rep-center {
+    grid-template-rows: none;
+    grid-template-columns: auto 1fr;
+    justify-items: start;
+    gap: var(--s-5);
+  }
+  .rep-dial {
+    width: min(58vh, 200px);
+  }
+  .rep-number {
+    font-size: clamp(3rem, 30vh, 5.5rem);
+  }
+  .rep-toast-slot {
+    min-height: 0;
+    justify-self: center;
+  }
+  .rep-hud,
+  .rep.is-timed .rep-hud {
+    grid-template-columns: 1fr auto auto auto;
+    gap: var(--s-4);
+    padding-top: var(--s-2);
+  }
+  .rep-hud .wk-clock {
+    grid-column: auto;
+  }
+  .rep-hud .wk-actions {
+    grid-column: auto;
+    justify-self: end;
+    justify-content: flex-end;
+  }
+  .rep .hud-stat .display {
+    font-size: 1.6rem;
+  }
+  .rep-position,
+  .rep-setup-how {
+    display: none;
+  }
+}

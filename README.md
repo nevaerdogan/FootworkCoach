@@ -12,6 +12,7 @@ Everything runs on your device. The camera stream is never uploaded, there is no
 - **Animated demo fighter** that performs every drill before you try it, driven by the same movement definitions the detector uses.
 - **Drills, rounds and timed workouts** — work/rest intervals (default 1 min / 30 s, 4 rounds) with spoken English cues, a round bell and rest screens.
 - **Custom combinations** built from any detectable move.
+- **Rep counting** for push-ups, sit-ups and jump rope — timed circuits (45 s work / 15 s rest, 1–6 rounds) or free practice, with every rep spoken aloud so you never have to look at the screen, partial reps flagged, and the screen kept awake.
 - **Scoring and results** — per-move accuracy, sequence alignment, a footwork trajectory diagram, and history with comparison to your previous session (stored in `localStorage`).
 - **Responsive** across phone (portrait and landscape), tablet and desktop, with safe-area support and reduced-motion respected.
 
@@ -44,6 +45,19 @@ camera ─► PoseLandmarker ─► PoseFrame ─► MotionAnalyzer ─► movem
 4. **Training** (`src/training`) — sessions open a window for each expected move and match what was detected. Scoring weighs direction, displacement, sequence (LCS alignment) and timing. Workouts add a schedule of work/rest blocks and score accuracy, rhythm and volume.
 5. **Definitions** (`src/movements.ts`) — the single source of truth for every move: detection, demo animation, combination rules and scoring all read from it.
 
+### Rep counting
+
+```
+camera ─► PoseLandmarker ─► PoseFrame ─► ExerciseCounter ─► rep events ─► IntervalSession / free set ─► summary ─► results
+                                          ├─ PushUpCounter  elbow angle, side view
+                                          ├─ SitUpCounter   torso angle above the floor, side view
+                                          └─ JumpCounter    hip height peaks, front view
+```
+
+Push-ups and sit-ups are measured from a side view, the way most pose-based rep counters work. A joint angle becomes a 0..1 depth signal that a hysteresis counter (`src/reps/RepCounter.ts`) turns into reps: a rep is entered above one threshold and counted only when the body is back below a lower one, so hovering near a threshold never produces phantom reps. Push-ups use the elbow angle (straight arms ≈ 155°, full depth ≈ 95°); sit-ups use the torso's angle above the floor line, which does not depend on how far the knees are bent. Attempts that reach only part of the range are reported as partial reps, not counted. A posture gate (torso near the floor for push-ups, legs on the floor for sit-ups, standing for rope) means arm curls while standing never count as push-ups.
+
+Jump rope counts jumps from the hip height above a slowly following resting height, in torso lengths. Two rules matter for skipping: the feet must leave the floor too (a knee bend is not a jump), and a jump must reach half the height of the recent jumps, so the small rebound hop of the "double bounce" style is not counted as a second jump.
+
 All tunable thresholds live in `src/config.ts`.
 
 ## Project structure
@@ -54,10 +68,12 @@ src/
   config.ts        Every threshold and timing constant
   pose/            Pose estimation wrapper, landmark conversion, readiness checks, skeleton drawing
   footwork/        Detectors, smoothing, geometry, calibration baseline, state machine
+  reps/            Rep counters for push-ups, sit-ups and jump rope, and the hysteresis counter they share
+  conditioning/    Exercise definitions, timed interval session, result summaries
   training/        Sessions, workouts, combinations, scoring, history, sounds
   demo/            Timeline that animates the demo fighter
-  components/      Camera view, demo fighter, footwork diagram, transitions
-  screens/         Home, select, builder, demo, camera session stages, results
+  components/      Camera view, demo fighter, footwork diagram, rep dial, transitions
+  screens/         Home, select, builder, demo, camera session stages, rep counting, results
   styles/          Design tokens, global styles, responsive layer
   dev/             Development-only tools (excluded from production builds)
   test/            Shared test fixtures
@@ -87,8 +103,8 @@ npm run dev
 
 Available in `npm run dev` only:
 
-- `?synthetic` — replaces the webcam with a scripted pose feed that runs through the real pipeline.
-- `?fast` — shortens workouts for quick runs.
+- `?synthetic` — replaces the webcam with a scripted pose feed that runs through the real pipeline; `?synthetic=pushup`, `situp` or `jump` plays a rep-counting exercise instead.
+- `?fast` — shortens workouts and timed conditioning blocks for quick runs.
 - `?nointro` — skips the intro animation.
 - `?preview=results` — opens the results screen with sample data.
 
@@ -112,7 +128,7 @@ Video frames are processed in the browser and discarded. Nothing is uploaded or 
 
 ## Browser support
 
-Recent Chrome, Edge, Safari (iOS 16.4+) and Firefox with camera access. For best results, place the camera so your whole body, including your feet, is in frame.
+Recent Chrome, Edge, Safari (iOS 16.4+) and Firefox with camera access. For best results, place the camera so your whole body, including your feet, is in frame. For push-ups and sit-ups lay the phone on its side on the floor, 2–3 m away, so it sees you from the side; for jump rope prop it up facing you.
 
 ## License
 

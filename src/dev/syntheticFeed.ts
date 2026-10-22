@@ -1,7 +1,9 @@
 // Development only (?synthetic): feeds scripted poses through the real pipeline, so the whole
 // flow (setup → stance → countdown → training / practice) can be exercised without a webcam.
+// ?synthetic=pushup | situp | jump plays a rep-counting exercise instead (side view for the floor ones).
 import type { PoseFrame } from '../pose/types';
 import { makeFrame } from '../test/fixtures';
+import { pushUpFrame, sitUpFrame } from '../test/repFixtures';
 
 const ASPECT = 16 / 9;
 const TORSO = 0.25;
@@ -89,12 +91,39 @@ export function syntheticFrameAt(elapsed: number, now: number): PoseFrame {
   return frameOf(s, now);
 }
 
+type RepMode = 'pushup' | 'situp' | 'jump';
+/** Stand at the spot for the camera check, then start the exercise. */
+const REP_HOLD_MS = 6000;
+
+/** Push-ups at ~35/min, sit-ups at ~28/min, double-bounce rope skipping at 2 jumps/s. */
+export function syntheticRepFrameAt(mode: RepMode, elapsed: number, now: number): PoseFrame {
+  if (elapsed < REP_HOLD_MS) return makeFrame({ t: now });
+  const t = elapsed - REP_HOLD_MS;
+  switch (mode) {
+    case 'pushup': {
+      const p = (t % 1700) / 1200;
+      return pushUpFrame(now, p >= 1 ? 170 : 170 - 85 * Math.sin(Math.PI * p));
+    }
+    case 'situp': {
+      const p = (t % 2100) / 1600;
+      return sitUpFrame(now, p >= 1 ? 5 : 5 + 65 * ease(p < 0.5 ? p * 2 : 2 - p * 2));
+    }
+    case 'jump': {
+      const u = t % 1000;
+      const [inHop, height] = u < 500 ? [u, 0.14] : [u - 500, 0.05]; // jump, then the small rebound hop
+      const rise = inHop < 300 ? height * Math.sin((Math.PI * inHop) / 300) : 0;
+      return makeFrame({ t: now, feetY: 0.88 - rise * TORSO });
+    }
+  }
+}
+
 /** Calls onFrame at ~30 fps with performance.now() timestamps. Returns a stop function. */
-export function startSyntheticFeed(onFrame: (f: PoseFrame) => void): () => void {
+export function startSyntheticFeed(onFrame: (f: PoseFrame) => void, mode = ''): () => void {
   const start = performance.now();
+  const rep = mode === 'pushup' || mode === 'situp' || mode === 'jump' ? mode : null;
   const id = setInterval(() => {
     const now = performance.now();
-    onFrame(syntheticFrameAt(now - start, now));
+    onFrame(rep ? syntheticRepFrameAt(rep, now - start, now) : syntheticFrameAt(now - start, now));
   }, 33);
   return () => clearInterval(id);
 }

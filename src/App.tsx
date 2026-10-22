@@ -12,11 +12,18 @@ import { SessionScreen } from './screens/SessionScreen';
 import { WorkoutResultsScreen } from './screens/WorkoutResultsScreen';
 import { Intro } from './components/Intro';
 import { PUNCH_COVER_MS, PunchTransition, punchAllowed } from './components/PunchTransition';
+import { planKey, planName, type ConditioningPlan } from './conditioning/exercises';
+import { summarizeInterval, type ConditioningResult } from './conditioning/summary';
+import { ConditioningResultsScreen } from './screens/ConditioningResultsScreen';
+import { ConditioningScreen } from './screens/ConditioningScreen';
+import { RepSessionScreen } from './screens/RepSessionScreen';
 import {
   loadHistory,
+  previousConditioning,
   previousFor,
   previousWorkout,
   saveRecord,
+  toConditioningRecord,
   toRecord,
   toWorkoutRecord,
   type SessionRecord,
@@ -35,10 +42,22 @@ const FAST = import.meta.env.DEV && new URLSearchParams(location.search).has('fa
 /** The opening sequence plays on every page load (dev: ?nointro skips it). */
 const SHOW_INTRO = !(import.meta.env.DEV && new URLSearchParams(location.search).has('nointro')) && !PREVIEW_RESULTS;
 
-type Screen = 'home' | 'select' | 'builder' | 'demo' | 'session' | 'practice' | 'results' | 'workoutResults';
+type Screen =
+  | 'home'
+  | 'select'
+  | 'builder'
+  | 'demo'
+  | 'session'
+  | 'practice'
+  | 'results'
+  | 'workoutResults'
+  | 'conditioning'
+  | 'repSession'
+  | 'conditioningResults';
 
 /**
  * Flow: HOME → SELECT/BUILD → DEMO → SESSION (camera · stance · countdown · train | workout) → RESULTS.
+ * Reps:  HOME → CONDITIONING (timed | free) → REP SESSION (camera · count) → RESULTS.
  * Screen changes animate with the View Transitions API where available (cross-fade, scale, blur).
  */
 function withTransition(update: () => void) {
@@ -63,6 +82,10 @@ export function App() {
   const [previousScore, setPreviousScore] = useState<number | null>(null);
   const [intro, setIntro] = useState(SHOW_INTRO);
   const [punch, setPunch] = useState<number | null>(null);
+  // Rep counting (push-ups, sit-ups, rope).
+  const [plan, setPlan] = useState<ConditioningPlan | null>(null);
+  const [conditioningResult, setConditioningResult] = useState<ConditioningResult | null>(null);
+  const [previousReps, setPreviousReps] = useState<number | null>(null);
 
   /** Big moments get the jab transition: the screen swaps while the glove covers it. */
   const punchTo = (s: Screen, before?: () => void) => {
@@ -92,6 +115,10 @@ export function App() {
     unlockAudio(); // user gesture: allow round cues later
     punchTo('session', () => setRound((n) => n + 1));
   };
+  const startRepSession = () => {
+    unlockAudio(); // reps are spoken aloud
+    punchTo('repSession', () => setRound((n) => n + 1));
+  };
   const home = () => setScreen('home');
 
   const content = (() => {
@@ -103,8 +130,46 @@ export function App() {
             onStart={() => punchTo('select')}
             onCustom={() => setScreen('builder')}
             onPractice={() => setScreen('practice')}
+            onConditioning={() => setScreen('conditioning')}
           />
         );
+      case 'conditioning':
+        return (
+          <ConditioningScreen
+            onBack={home}
+            onStart={(p) => {
+              setPlan(p);
+              startRepSession();
+            }}
+          />
+        );
+      case 'repSession':
+        return plan ? (
+          <RepSessionScreen
+            key={round}
+            plan={plan}
+            onExit={home}
+            onComplete={(r) => {
+              const total = r.mode === 'timed' ? summarizeInterval(r.result).total : r.result.reps;
+              const durationMs = r.mode === 'timed' ? summarizeInterval(r.result).workSeconds * 1000 : r.result.endTime - r.result.startTime;
+              const key = planKey(plan);
+              setConditioningResult(r);
+              setPreviousReps(previousConditioning(key, history)?.reps ?? null);
+              setHistory(saveRecord(toConditioningRecord(key, planName(plan), total, durationMs)));
+              setScreen('conditioningResults');
+            }}
+          />
+        ) : null;
+      case 'conditioningResults':
+        return conditioningResult ? (
+          <ConditioningResultsScreen
+            result={conditioningResult}
+            previousReps={previousReps}
+            onAgain={startRepSession}
+            onChoose={() => setScreen('conditioning')}
+            onHome={home}
+          />
+        ) : null;
       case 'select':
         return <SelectScreen onBack={home} onContinue={watch} onWorkout={watchWorkout} />;
       case 'builder':

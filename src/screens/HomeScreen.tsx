@@ -13,6 +13,7 @@ interface Props {
   onStart: () => void;
   onCustom: () => void;
   onPractice: () => void;
+  onConditioning: () => void;
 }
 
 /** Drills the hero diagram cycles through. */
@@ -32,9 +33,10 @@ function timeAgo(iso: string, now = Date.now()): string {
   return d === 1 ? 'yesterday' : `${d} days ago`;
 }
 
-export function HomeScreen({ history, onStart, onCustom, onPractice }: Props) {
+export function HomeScreen({ history, onStart, onCustom, onPractice, onConditioning }: Props) {
   const last = history[0];
-  const recent = history.slice(0, 8).reverse();
+  // The sparkline is footwork scores only; rep counts are a different unit.
+  const recent = last?.kind === 'conditioning' ? [] : history.filter((r) => r.kind !== 'conditioning').slice(0, 8).reverse();
   const [drillIndex, setDrillIndex] = useState(0);
   const [step, setStep] = useState(-1);
   const drill = SHOWCASE[drillIndex];
@@ -124,13 +126,18 @@ export function HomeScreen({ history, onStart, onCustom, onPractice }: Props) {
             <button className="btn btn-ghost" onClick={onCustom}>
               Build your own
             </button>
+            <button className="btn btn-ghost" onClick={onConditioning}>
+              <Icon name="pushup" /> Count reps
+            </button>
           </div>
 
           {last && (
             <div className="home-recent" aria-label="Last session">
               <span className="label">Last session</span>
               <span className="home-recent-row">
-                <strong className="mono home-recent-score">{last.overallScore}%</strong>
+                <strong className="mono home-recent-score">
+                  {last.kind === 'conditioning' ? `${last.reps ?? 0} reps` : `${last.overallScore}%`}
+                </strong>
                 <span className="muted">
                   {last.workoutName ?? `${last.combination.length}-move round`} · {timeAgo(last.date)}
                 </span>

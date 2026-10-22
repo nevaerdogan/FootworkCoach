@@ -216,3 +216,80 @@ export const SCORING_CONFIG = {
   maxIssues: 3,
   maxPositives: 2,
 };
+
+/**
+ * Rep counting for conditioning exercises (push-ups, sit-ups, jump rope).
+ * Angles in degrees, lengths in torso units. Depth signals run 0 (rest) .. 1 (full range) and are
+ * counted with hysteresis: a rep starts above `enter` and is counted when the body returns below
+ * `exit`; excursions that only reach `partial` are reported but not counted.
+ */
+export const REP_CONFIG = {
+  /** EMA factor for the per-frame depth signal. */
+  alpha: 0.5,
+  /** Landmark visibility needed on the tracked side. */
+  minVisibility: 0.5,
+  /** Switch to the other body side only when it is clearly better visible (no frame-to-frame flips). */
+  sideSwitchMargin: 0.15,
+  /** Tracking lost for this long aborts the rep in progress. */
+  lostTimeoutMs: 500,
+  pushUp: {
+    /** Elbow angle with the arms straight, and at full depth (ideal bottom is 90–110°). */
+    upAngle: 155,
+    downAngle: 95,
+    enter: 0.85,
+    exit: 0.25,
+    partial: 0.4,
+    minRepMs: 400,
+    minHoldMs: 50,
+    /** Torso must be near the floor line (deg) to count: no push-ups while standing. */
+    maxTorsoIncline: 40,
+    /** Shoulder–hip–ankle angle below this = hips sagging or piked (form hint only). */
+    straightBodyAngle: 160,
+  },
+  sitUp: {
+    /** Torso angle above the floor line when lying, and when fully up. */
+    downAngle: 12,
+    upAngle: 60,
+    enter: 0.85,
+    exit: 0.25,
+    partial: 0.4,
+    minRepMs: 600,
+    minHoldMs: 50,
+    /** Legs must stay near the floor (hip→ankle incline, deg): no sit-ups while standing. */
+    maxLegIncline: 55,
+    /** Same check from the thigh when the ankle is not visible (knees are bent, so it sits higher). */
+    maxThighIncline: 75,
+  },
+  jump: {
+    alpha: 0.5,
+    /** The resting height follows the body slowly upward… */
+    baselineAlpha: 0.02,
+    /** …and quickly downward (landing, crouching). */
+    baselineDownAlpha: 0.3,
+    /** Smallest hip rise that can be a jump (≈ 2 cm). */
+    minAmplitude: 0.045,
+    /** A jump must also reach this fraction of the recent jumps' typical height (rejects rebound hops). */
+    relativeAmplitude: 0.5,
+    /** Both feet must leave the floor by about this much; bending the knees alone is not a jump. */
+    minAnkleRise: 0.02,
+    /** Fast skippers reach ~4 jumps per second. */
+    minIntervalMs: 180,
+    /** Legs must be near upright (hip→ankle incline, deg): standing, not lying. */
+    minLegIncline: 55,
+    /** Typical jump height used for the live gauge before any jump has been seen. */
+    gaugeAmplitude: 0.12,
+  },
+} as const;
+
+/** Timed conditioning: every exercise block is `workSeconds` long, followed by `restSeconds`. */
+export const CONDITIONING_CONFIG = {
+  workSeconds: 45,
+  restSeconds: 15,
+  rounds: 3,
+  minRounds: 1,
+  maxRounds: 6,
+  /** Get-ready countdown before the first block: time to get down on the floor. */
+  getReadySeconds: 5,
+  /** Free practice: pace and consistency need at least this many reps to be reported. */
+  minRepsForStats: 4,
+} as const;
