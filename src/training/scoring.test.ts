@@ -126,6 +126,25 @@ describe('scoreSession', () => {
     expect(r.movements[0].sizeRatio).toBe(1); // an in-place switch has no size to fall short on
   });
 
+  it('after a stance switch the foot-order feedback names the new lead foot', () => {
+    // Southpaw after the switch: the forward step should lead with the right foot, the user led with the left.
+    const r = play(
+      ['SWITCH_STANCE', 'FORWARD_STEP'],
+      [move('SWITCH_STANCE', 300), move('FORWARD_STEP', 1100, { firstFoot: 'left', footOrder: 'left-first' })],
+    );
+    expect(r.movements[1].footOrderOk).toBe(false);
+    expect(r.feedback.map((f) => f.text)).toContain('On the forward step, move your right foot first.');
+  });
+
+  it('two switches restore the original stance: the forward step leads with the left foot again', () => {
+    const r = play(
+      ['SWITCH_STANCE', 'SWITCH_STANCE', 'FORWARD_STEP'],
+      [move('SWITCH_STANCE', 300), move('SWITCH_STANCE', 1100), move('FORWARD_STEP', 1900, { firstFoot: 'right', footOrder: 'right-first' })],
+    );
+    expect(r.movements[2].footOrderOk).toBe(false);
+    expect(r.feedback.map((f) => f.text)).toContain('On the forward step, move your left foot first.');
+  });
+
   it('every score is the documented weighted formula', () => {
     const r = play(['LEFT_STEP'], [move('LEFT_STEP', 300, { directionConfidence: 0.8, displacement: 0.3 })]);
     const c = r.movements[0].components;

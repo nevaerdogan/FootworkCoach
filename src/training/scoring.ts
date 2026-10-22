@@ -48,7 +48,9 @@ export interface SessionScore {
 
 const C = SCORING_CONFIG;
 const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
-const leadFootOf = () => (TRAINING_CONFIG.stance === 'orthodox' ? 'left' : 'right');
+/** Anatomical lead foot for move `index`: the configured stance, flipped by every switch or shift before it. */
+const leadFootAt = (combination: MovementId[], index: number): 'left' | 'right' =>
+  stanceAt(combination, index, TRAINING_CONFIG.stance) === 'orthodox' ? 'left' : 'right';
 
 /** 1 inside the good range, falling linearly to 0 at the zero points. */
 export function sizeScore(ratio: number): number {
@@ -105,7 +107,6 @@ type Performed = AttemptRecord & { detected: DetectedMovement };
 
 export function scoreSession(result: SessionResult): SessionScore {
   const { combination, attempts } = result;
-  const leadFoot = leadFootOf();
   // Detections in the order they happened (missed slots carry no detection).
   const performed = attempts.filter((a): a is Performed => a.detected !== null);
   const pairs = alignSequence(
@@ -130,9 +131,7 @@ export function scoreSession(result: SessionResult): SessionScore {
         timing: timingScore(reactionMs, m.duration),
       };
       // The lead foot changes after every switch or shift earlier in the round.
-      const stance = stanceAt(combination, index, TRAINING_CONFIG.stance);
-      const lead = stance === TRAINING_CONFIG.stance ? leadFoot : leadFoot === 'left' ? 'right' : 'left';
-      const expectedFoot = def.kind === 'step' ? firstFootSide(def, lead) : null;
+      const expectedFoot = def.kind === 'step' ? firstFootSide(def, leadFootAt(combination, index)) : null;
       return {
         index,
         expected,
@@ -193,6 +192,8 @@ const lower = (id: MovementId) => MOVEMENTS[id].label.toLowerCase();
 export function buildFeedback(movements: MovementScore[], sequenceCorrect: boolean): Feedback[] {
   const issues: { severity: number; text: string; index: number }[] = [];
   const positives: string[] = [];
+  // Movements come in round order, so their expected ids are the combination (needed for the stance per move).
+  const combination = movements.map((m) => m.expected);
 
   for (const m of movements) {
     const def = MOVEMENTS[m.expected];
@@ -229,7 +230,11 @@ export function buildFeedback(movements: MovementScore[], sequenceCorrect: boole
       });
     }
     if (m.footOrderOk === false) {
-      issues.push({ index: m.index, severity: 1, text: `On the ${lower(m.expected)}, move your ${firstFootSide(def, leadFootOf())} foot first.` });
+      issues.push({
+        index: m.index,
+        severity: 1,
+        text: `On the ${lower(m.expected)}, move your ${firstFootSide(def, leadFootAt(combination, m.index))} foot first.`,
+      });
     }
   }
 
