@@ -37,6 +37,8 @@ export class RepCounter {
   private peak = 0;
   private enteredAt: number | null = null;
   private lastEnterAt = 0;
+  /** The excursion began before counting started (the body was never seen at rest): don't count it. */
+  private unanchored = false;
 
   constructor(private cfg: RepCounterConfig) {}
 
@@ -51,6 +53,7 @@ export class RepCounter {
       if (depth < C.exit) this.restAt = t;
       if (depth >= C.partial) {
         this.out = true;
+        this.unanchored = this.restAt === null;
         this.startAt = this.restAt ?? t;
         this.peak = depth;
         this.enteredAt = depth >= C.enter ? t : null;
@@ -68,6 +71,10 @@ export class RepCounter {
     // Back at rest: judge the whole excursion.
     this.out = false;
     this.restAt = t;
+    if (this.unanchored) {
+      this.unanchored = false;
+      return null; // only the second half was seen
+    }
     const durationMs = t - this.startAt;
     if (this.enteredAt !== null) {
       if (this.lastEnterAt - this.enteredAt >= C.minHoldMs && durationMs >= C.minRepMs) {

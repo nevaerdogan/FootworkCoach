@@ -64,6 +64,16 @@ describe('RepCounter', () => {
     expect(c.reps).toBe(1);
   });
 
+  it('a set that starts at the bottom does not count the rise as a rep', () => {
+    const c = new RepCounter(cfg);
+    // Counting starts with the body already at full depth; it comes up over 600 ms…
+    run(c, (t) => Math.max(0, 1 - t / 600), 800);
+    expect(c.reps + c.partials).toBe(0);
+    // …and the next full excursion counts as usual.
+    run(c, bump(1000), 1400, 1000);
+    expect(c.reps).toBe(1);
+  });
+
   it('abort drops the excursion in progress but keeps the totals', () => {
     const c = new RepCounter(cfg);
     run(c, bump(1000), 1400);
