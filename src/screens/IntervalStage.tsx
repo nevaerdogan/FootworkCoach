@@ -1,17 +1,15 @@
-import { clockRemaining } from '../format';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePoseFrames } from '../components/CameraView';
 import { Icon } from '../components/Icon';
 import { RepDial, setDial } from '../components/RepDial';
+import { RepFeedbackToast, useRepFeedback } from '../components/RepFeedback';
 import { Stinger } from '../components/Stinger';
 import { EXERCISES, type ExerciseId } from '../conditioning/exercises';
 import { IntervalSession, type IntervalPhase, type IntervalPlan, type IntervalResult } from '../conditioning/IntervalSession';
-import { createCounter, type ExerciseCounter, type Tracking } from '../reps/createCounter';
+import { clockRemaining } from '../format';
+import { createCounter, type ExerciseCounter } from '../reps/createCounter';
 import { beep, bell, isMuted, say, setMuted } from '../training/sounds';
 import './RepStage.css';
-
-const WARN_MS = 400;
-const HINT_MS = 1600;
 
 interface View {
   phase: IntervalPhase;
@@ -48,8 +46,7 @@ export function IntervalStage({ plan, onComplete }: Props) {
     total: 0,
     lastBlock: null,
   });
-  const [warning, setWarning] = useState<{ tracking: Tracking; text: string } | null>(null);
-  const [hint, setHint] = useState<{ text: string; key: number } | null>(null);
+  const { warning, hint, track, reset: resetFeedback } = useRepFeedback();
   const [muted, setMutedState] = useState(isMuted);
   const [roundStinger, setRoundStinger] = useState<number | null>(null);
   const counterRef = useRef<ExerciseCounter | null>(null);
@@ -60,22 +57,13 @@ export function IntervalStage({ plan, onComplete }: Props) {
   const startedRef = useRef(false);
   const finishedRef = useRef(false);
   const lastSecondRef = useRef<number | null>(null);
-  const lostSinceRef = useRef<number | null>(null);
-  const warningRef = useRef<Tracking>('ok');
-  const hintTimer = useRef(0);
   const finishTimer = useRef(0);
   const counts = useRef({ blockReps: 0, blockPartials: 0, total: 0, lastBlock: null as View['lastBlock'] });
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
 
-  // Leaving the stage must not fire a pending hint or open the results afterwards.
-  useEffect(
-    () => () => {
-      clearTimeout(hintTimer.current);
-      clearTimeout(finishTimer.current);
-    },
-    [],
-  );
+  // Leaving the stage during the finish delay must not open the results afterwards.
+  useEffect(() => () => clearTimeout(finishTimer.current), []);
 
   const finish = (t: number, early: boolean) => {
     if (finishedRef.current) return;
@@ -113,9 +101,7 @@ export function IntervalStage({ plan, onComplete }: Props) {
         say(`Rest. Next: ${def.voice}. ${def.position}`);
       }
       lastSecondRef.current = null;
-      setWarning(null);
-      warningRef.current = 'ok';
-      lostSinceRef.current = null;
+      resetFeedback();
       setDial(fillRef.current, 0);
     }
     if (st.phase === 'done') {
@@ -135,13 +121,7 @@ export function IntervalStage({ plan, onComplete }: Props) {
     const counter = counterRef.current;
     if (st.phase === 'work' && counter) {
       const u = counter.push(frame, now);
-      if (u.tracking !== 'ok') lostSinceRef.current ??= now;
-      else lostSinceRef.current = null;
-      const warn: Tracking = lostSinceRef.current !== null && now - lostSinceRef.current > WARN_MS ? u.tracking : 'ok';
-      if (warn !== warningRef.current) {
-        warningRef.current = warn;
-        setWarning(warn === 'ok' ? null : { tracking: warn, text: warn === 'lost' ? "Can't see you" : (u.hint ?? 'Get into position') });
-      }
+      track(u, now);
       if (u.event) {
         session.onRep(u.event.kind, now);
         if (u.event.kind === 'rep') {
@@ -150,11 +130,6 @@ export function IntervalStage({ plan, onComplete }: Props) {
           if (u.reps % def.countEvery === 0) say(String(u.reps));
         } else c.blockPartials = u.partials;
         changed = true;
-      }
-      if (u.hint && u.tracking === 'ok') {
-        setHint({ text: u.hint, key: now });
-        clearTimeout(hintTimer.current);
-        hintTimer.current = window.setTimeout(() => setHint(null), HINT_MS);
       }
       setDial(fillRef.current, u.progress);
     }
@@ -204,16 +179,7 @@ export function IntervalStage({ plan, onComplete }: Props) {
       <div className="rep-center">
         <RepDial reps={blockReps} caption={blockReps === 1 ? 'rep' : 'reps'} fillRef={fillRef} />
         <div className="rep-toast-slot">
-          {warning ? (
-            <div className="training-toast reveal" key={warning.tracking}>
-              <span className="label">{warning.tracking === 'lost' ? 'Keep going' : 'Position'}</span>
-              <strong className="h2">{warning.text}</strong>
-            </div>
-          ) : hint ? (
-            <div className="training-toast is-wrong" key={hint.key}>
-              <strong className="h2">{hint.text}</strong>
-            </div>
-          ) : null}
+          <RepFeedbackToast warning={warning} hint={hint} lostLabel="Keep going" />
         </div>
       </div>
 
