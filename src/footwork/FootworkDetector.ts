@@ -36,6 +36,8 @@ export interface DetectedMovement extends Classification {
 }
 
 export interface PushOptions {
+  /** Clock for frames without a pose (null frames carry no timestamp), so a tracking loss can time out. */
+  now?: number;
   /**
    * Ignore body rotation (e.g. while a punch is thrown: a cross turns the torso 30–40°,
    * which must not be read as a pivot). The reference yaw follows the body meanwhile.
@@ -107,7 +109,7 @@ export class FootworkDetector {
 
   push(frame: PoseFrame | null, opts: PushOptions = {}): DetectorUpdate {
     if (!frame || !isLandmarkVisible(frame.leftAnkle) || !isLandmarkVisible(frame.rightAnkle)) {
-      return this.handleLost(frame?.timestamp ?? this.prev?.t ?? 0);
+      return this.handleLost(frame?.timestamp ?? opts.now ?? this.prev?.t ?? 0);
     }
     this.lostSince = null;
 
@@ -305,8 +307,10 @@ export class FootworkDetector {
 
   private handleLost(t: number): DetectorUpdate {
     this.lostSince ??= t;
-    if (this.machine.isMoving && t - this.lostSince > this.cfg.lostTimeoutMs) {
-      // Can't trust a movement we lost track of: drop it and re-anchor when feet return.
+    if (t - this.lostSince > this.cfg.lostTimeoutMs) {
+      // The feet have been gone too long to trust where they were: drop any movement in progress
+      // and re-anchor the reference stance wherever they reappear, so coming back into frame at a
+      // different spot is never read as a step.
       this.rebase();
     }
     return { state: 'LOW_CONFIDENCE', displacement: 0, rotation: 0 };

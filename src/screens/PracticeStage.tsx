@@ -36,8 +36,8 @@ export function PracticeStage({ baseline, onRecalibrate, onDone }: Props) {
   const bounceTimes = useRef<number[]>([]);
 
   usePoseFrames((frame) => {
-    const u = analyzer.push(frame);
-    const now = performance.now();
+    const now = frame?.timestamp ?? performance.now();
+    const u = analyzer.push(frame, now);
 
     if (u.state === 'LOW_CONFIDENCE') lostSinceRef.current ??= now;
     else lostSinceRef.current = null;

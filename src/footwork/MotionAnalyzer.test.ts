@@ -140,3 +140,16 @@ describe('regressions from real-camera sessions', () => {
     expect(run(frames)).toEqual(['PIVOT_LEFT']);
   });
 });
+
+describe('tracking loss', () => {
+  it('re-anchors when the athlete disappears and comes back somewhere else: no phantom step', () => {
+    const a = new MotionAnalyzer(baseline());
+    const moves: string[] = [];
+    for (const f of stillFrames(1000, { yaw: 0 })) moves.push(...a.push(f).movements.map((m) => m.type));
+    // No pose at all for 1.5 s (the athlete walked out of frame); only the clock advances.
+    for (let t = 1033; t <= 2500; t += 33) moves.push(...a.push(null, t).movements.map((m) => m.type));
+    // Back in frame, standing still half a metre to the side.
+    for (const f of stillFrames(2000, { yaw: 0, cx: 0.6 }, 2533)) moves.push(...a.push(f).movements.map((m) => m.type));
+    expect(moves).toEqual([]);
+  });
+});

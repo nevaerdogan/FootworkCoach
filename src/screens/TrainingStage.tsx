@@ -57,7 +57,7 @@ export function TrainingStage({ baseline, combination, onComplete }: Props) {
       session.start(now);
       startedRef.current = true;
     }
-    const u = analyzer.push(frame);
+    const u = analyzer.push(frame, now);
     const visible = u.state !== 'LOW_CONFIDENCE';
 
     if (!visible) lostSinceRef.current ??= now;

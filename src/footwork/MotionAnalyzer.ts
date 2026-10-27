@@ -35,15 +35,16 @@ export class MotionAnalyzer {
     this.bounces = !candidates || candidates.some((c) => c.kind === 'rhythm') ? new BounceDetector() : null;
   }
 
-  push(frame: PoseFrame | null): AnalyzerUpdate {
-    const t = frame?.timestamp ?? 0;
+  /** `now` keeps time moving while no pose is detected (null frames carry no timestamp). */
+  push(frame: PoseFrame | null, now?: number): AnalyzerUpdate {
+    const t = frame?.timestamp ?? now ?? 0;
     const pu = this.punches?.push(frame);
     // Ignore body rotation only while a punch is actually being thrown (and shortly after, while
     // the torso returns). Small arm movements must never hide a real pivot.
     if (pu?.extending || pu?.punch) this.punchAt = t;
     const suppressRotation = t - this.punchAt < PUNCH_CONFIG.suppressHoldMs;
 
-    const u = this.footwork.push(frame, { suppressRotation });
+    const u = this.footwork.push(frame, { suppressRotation, now });
     const movements: DetectedMovement[] = [];
     if (u.movement) {
       movements.push(u.movement);

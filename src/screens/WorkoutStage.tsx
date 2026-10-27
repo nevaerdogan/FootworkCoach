@@ -94,7 +94,7 @@ export function WorkoutStage({ baseline, workout, onComplete }: Props) {
       startedRef.current = true;
       say(`Round 1. ${blockName(0)}. Get ready.`);
     }
-    const u = analyzer.push(frame);
+    const u = analyzer.push(frame, now);
     const st = session.tick(now);
 
     // Phase changes: sound cues + React state.
