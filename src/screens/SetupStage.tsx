@@ -2,10 +2,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePoseFrames } from '../components/CameraView';
 import { Icon } from '../components/Icon';
 import { READINESS_CONFIG } from '../config';
-import { assessReadiness, BODY_PARTS, readinessKey, type Guidance, type Readiness } from '../pose/readiness';
+import { assessReadiness, BODY_PARTS, readinessKey, type BodyPart, type Guidance, type Readiness } from '../pose/readiness';
 import type { PoseFrame } from '../pose/types';
 
-const GUIDANCE: Record<Guidance | 'HOLD' | 'CONFIRMED', { title: string; body: string }> = {
+type Copy = Record<Guidance | 'HOLD' | 'CONFIRMED', { title: string; body: string }>;
+
+const GUIDANCE: Copy = {
   CONFIRMED: { title: 'Position checked', body: 'Press Continue or Space, then step back into frame.' },
   NO_PERSON: { title: 'Step into frame', body: 'Stand 2–3 m from the camera, facing it.' },
   STEP_BACK: { title: 'Step back', body: 'Step back until your full body is visible.' },
@@ -14,8 +16,26 @@ const GUIDANCE: Record<Guidance | 'HOLD' | 'CONFIRMED', { title: string; body: s
   READY: { title: "You're set", body: 'Hold your position — continuing automatically.' },
 };
 
-export function SetupStage({ onContinue }: { onContinue: () => void }) {
-  const [readiness, setReadiness] = useState<Readiness>(() => assessReadiness(null));
+interface Props {
+  onContinue: () => void;
+  /** Readiness rule; by default the whole body must face the camera. */
+  assess?: (frame: PoseFrame | null) => Readiness;
+  /** Which body-part checks to show (default: all of them). */
+  parts?: BodyPart[];
+  /** Overrides for the guidance copy. */
+  copy?: Partial<Copy>;
+  /** Shown above the status, e.g. which exercise this setup is for. */
+  kicker?: React.ReactNode;
+  /** Extra guidance under the status, e.g. where to put the phone. */
+  children?: React.ReactNode;
+}
+
+/**
+ * Camera framing check: the athlete stands on the spot until every required body part has been
+ * in frame for a moment; Continue then unlocks and fires by itself if they keep holding position.
+ */
+export function SetupStage({ onContinue, assess = assessReadiness, parts, copy, kicker, children }: Props) {
+  const [readiness, setReadiness] = useState<Readiness>(() => assess(null));
   // `confirmed` latches: once the full body was seen, walking to the keyboard
   // (and leaving the frame) must not disable Continue again.
   const [confirmed, setConfirmed] = useState(false);
@@ -47,7 +67,7 @@ export function SetupStage({ onContinue }: { onContinue: () => void }) {
   }, [finish]);
 
   usePoseFrames((frame: PoseFrame | null) => {
-    const r = assessReadiness(frame);
+    const r = assess(frame);
     const key = readinessKey(r);
     if (key !== keyRef.current) {
       keyRef.current = key;
@@ -70,13 +90,9 @@ export function SetupStage({ onContinue }: { onContinue: () => void }) {
     if (heldMs >= READINESS_CONFIG.stableMs + READINESS_CONFIG.autoContinueMs) finish();
   });
 
-  const guidance = readiness.ready
-    ? holding
-      ? GUIDANCE.READY
-      : GUIDANCE.HOLD
-    : confirmed
-      ? GUIDANCE.CONFIRMED
-      : GUIDANCE[readiness.guidance];
+  const text: Copy = { ...GUIDANCE, ...copy };
+  const guidance = readiness.ready ? (holding ? text.READY : text.HOLD) : confirmed ? text.CONFIRMED : text[readiness.guidance];
+  const checks = parts ? BODY_PARTS.filter((p) => parts.includes(p.id)) : BODY_PARTS;
 
   return (
     <>
@@ -86,12 +102,14 @@ export function SetupStage({ onContinue }: { onContinue: () => void }) {
 
       <footer className="session-bottom">
         <div className="session-guidance" key={guidance.title}>
+          {kicker}
           <h2 className="h2">{guidance.title}</h2>
           <p className="muted">{guidance.body}</p>
+          {children}
         </div>
 
         <ul className="setup-checks" aria-label="Body tracking">
-          {BODY_PARTS.map((p) => (
+          {checks.map((p) => (
             <li key={p.id} className={readiness.parts[p.id] ? 'is-on' : ''}>
               <i />
               <span className="label">{p.label}</span>
