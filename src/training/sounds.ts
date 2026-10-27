@@ -88,6 +88,10 @@ export function say(text: string) {
   u.lang = englishVoice?.lang ?? 'en-US';
   if (englishVoice) u.voice = englishVoice;
   u.rate = 1.05;
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(u);
+  const synth = window.speechSynthesis;
+  const busy = synth.speaking || synth.pending;
+  synth.cancel();
+  // Chrome on Android can drop an utterance queued in the same tick as cancel(): let it settle first.
+  if (busy) setTimeout(() => synth.speak(u), 0);
+  else synth.speak(u);
 }
