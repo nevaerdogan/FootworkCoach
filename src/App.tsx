@@ -150,8 +150,16 @@ export function App() {
             plan={plan}
             onExit={home}
             onComplete={(r) => {
-              const total = r.mode === 'timed' ? summarizeInterval(r.result).total : r.result.reps;
-              const durationMs = r.mode === 'timed' ? summarizeInterval(r.result).workSeconds * 1000 : r.result.endTime - r.result.startTime;
+              let total: number;
+              let durationMs: number;
+              if (r.mode === 'timed') {
+                const s = summarizeInterval(r.result);
+                total = s.total;
+                durationMs = s.workSeconds * 1000;
+              } else {
+                total = r.result.reps;
+                durationMs = r.result.endTime - r.result.startTime;
+              }
               const key = planKey(plan);
               setConditioningResult(r);
               setPreviousReps(previousConditioning(key, history)?.reps ?? null);
