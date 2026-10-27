@@ -1,3 +1,4 @@
+import { mmss } from '../format';
 import { useMemo } from 'react';
 import { Icon } from '../components/Icon';
 import { Stinger } from '../components/Stinger';
@@ -16,7 +17,6 @@ interface Props {
 }
 
 const pct = (x: number) => `${Math.round(x * 100)}%`;
-const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
 export function WorkoutResultsScreen({ result, previousScore, onTrainAgain, onNewWorkout, onHome }: Props) {
   const score = useMemo(() => scoreWorkout(result), [result]);

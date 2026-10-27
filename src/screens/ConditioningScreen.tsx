@@ -1,3 +1,4 @@
+import { mmss } from '../format';
 import { useState } from 'react';
 import { Icon } from '../components/Icon';
 import { EXERCISE_LIST, type ConditioningPlan, type ExerciseId } from '../conditioning/exercises';
@@ -9,7 +10,6 @@ import './RepStage.css';
 type Tab = 'timed' | 'free';
 const TAB_LABEL: Record<Tab, string> = { timed: 'Timed', free: 'Free' };
 const C = CONDITIONING_CONFIG;
-const duration = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
 interface Props {
   onBack: () => void;
@@ -93,8 +93,8 @@ export function ConditioningScreen({ onBack, onStart }: Props) {
               </button>
             </div>
             <span className="muted cond-total">
-              {exercises.length} {exercises.length === 1 ? 'exercise' : 'exercises'} × {rounds} · {duration(C.workSeconds)} on / {C.restSeconds} s off ·{' '}
-              {duration(total)} total
+              {exercises.length} {exercises.length === 1 ? 'exercise' : 'exercises'} × {rounds} · {mmss(C.workSeconds)} on / {C.restSeconds} s off ·{' '}
+              {mmss(total)} total
             </span>
           </div>
         )}

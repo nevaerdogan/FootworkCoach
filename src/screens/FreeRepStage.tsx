@@ -1,3 +1,4 @@
+import { clockElapsed } from '../format';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePoseFrames } from '../components/CameraView';
 import { Icon } from '../components/Icon';
@@ -12,10 +13,6 @@ import './RepStage.css';
 const WARN_MS = 400;
 const HINT_MS = 1600;
 
-const fmt = (ms: number) => {
-  const s = Math.max(0, Math.floor(ms / 1000));
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
-};
 
 interface Props {
   exercise: ExerciseId;
@@ -76,7 +73,7 @@ export function FreeRepStage({ exercise, onFinish }: Props) {
 
     // Per-frame numbers go straight to the DOM.
     setDial(fillRef.current, u.progress);
-    if (timeRef.current) timeRef.current.textContent = fmt(now - startRef.current);
+    if (timeRef.current) timeRef.current.textContent = clockElapsed(now - startRef.current);
     const times = repTimes.current;
     if (paceRef.current) {
       const span = times.length >= 2 ? times[times.length - 1] - times[0] : 0;

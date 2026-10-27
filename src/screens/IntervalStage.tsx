@@ -1,3 +1,4 @@
+import { clockRemaining } from '../format';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePoseFrames } from '../components/CameraView';
 import { Icon } from '../components/Icon';
@@ -11,10 +12,6 @@ import './RepStage.css';
 
 const WARN_MS = 400;
 const HINT_MS = 1600;
-const fmt = (ms: number) => {
-  const s = Math.max(0, Math.ceil(ms / 1000));
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
-};
 
 interface View {
   phase: IntervalPhase;
@@ -167,7 +164,7 @@ export function IntervalStage({ plan, onComplete }: Props) {
     }
     if (changed) setView({ phase: st.phase, round: st.round, index: st.index, exercise: st.exercise, ...c });
 
-    const text = fmt(st.remainingMs);
+    const text = clockRemaining(st.remainingMs);
     if (timerRef.current) timerRef.current.textContent = text;
     if (restTimerRef.current) restTimerRef.current.textContent = text;
     if (barRef.current) barRef.current.style.transform = `scaleX(${1 - st.remainingMs / st.segmentMs})`;

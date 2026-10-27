@@ -1,3 +1,4 @@
+import { mmss } from '../format';
 import { useState } from 'react';
 import { Icon } from '../components/Icon';
 import { FootworkDiagram } from '../components/FootworkDiagram';
@@ -20,7 +21,6 @@ const comboFor = (level: Level, seed: number): MovementId[] =>
 type Tab = 'workouts' | 'rounds' | 'drills';
 const TAB_LABEL: Record<Tab, string> = { workouts: 'Workouts', rounds: 'Rounds', drills: 'Drills' };
 
-const duration = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
 interface Props {
   onBack: () => void;
@@ -71,7 +71,7 @@ export function SelectScreen({ onBack, onContinue, onWorkout }: Props) {
                 <span className="display">{w.name}</span>
                 <span className="muted">
                   {w.rounds} rounds · {w.blocks.length > 1 ? `${w.blocks.length} drills × ` : ''}
-                  {duration(w.blocks[0].seconds)} · {w.restSeconds} s rest · {duration(totalSeconds(w))} total
+                  {mmss(w.blocks[0].seconds)} · {w.restSeconds} s rest · {mmss(totalSeconds(w))} total
                 </span>
                 {w.source && <span className="level-source">From: {w.source}</span>}
               </span>

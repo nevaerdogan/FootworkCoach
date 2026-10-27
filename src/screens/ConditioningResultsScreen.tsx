@@ -1,3 +1,4 @@
+import { mmss } from '../format';
 import { useMemo } from 'react';
 import { Icon } from '../components/Icon';
 import { Stinger } from '../components/Stinger';
@@ -16,7 +17,6 @@ interface Props {
   onHome: () => void;
 }
 
-const mmss = (s: number) => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`;
 
 export function ConditioningResultsScreen({ result, previousReps, onAgain, onChoose, onHome }: Props) {
   const { timed, free } = useMemo(

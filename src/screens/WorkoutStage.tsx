@@ -1,3 +1,4 @@
+import { clockRemaining } from '../format';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePoseFrames } from '../components/CameraView';
 import { armDebug, debugInfo, isDebugMode } from '../components/DebugPanel';
@@ -32,10 +33,6 @@ interface View {
 }
 
 const LOST_WARNING_MS = 400;
-const fmt = (ms: number) => {
-  const s = Math.max(0, Math.ceil(ms / 1000));
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
-};
 
 /** Timed workout on the camera: round clock, current move, rest screens, sound cues. */
 export function WorkoutStage({ baseline, workout, onComplete }: Props) {
@@ -164,7 +161,7 @@ export function WorkoutStage({ baseline, workout, onComplete }: Props) {
     }
 
     // Clock + progress, straight to the DOM.
-    const text = fmt(st.remainingMs);
+    const text = clockRemaining(st.remainingMs);
     if (timerRef.current) timerRef.current.textContent = text;
     if (restTimerRef.current) restTimerRef.current.textContent = text;
     if (barRef.current) barRef.current.style.transform = `scaleX(${1 - st.remainingMs / st.segmentMs})`;
