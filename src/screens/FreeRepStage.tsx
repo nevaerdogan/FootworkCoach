@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePoseFrames } from '../components/CameraView';
 import { Icon } from '../components/Icon';
 import { RepDial, setDial } from '../components/RepDial';
@@ -42,6 +42,9 @@ export function FreeRepStage({ exercise, onFinish }: Props) {
   const finishedRef = useRef(false);
   const onFinishRef = useRef(onFinish);
   onFinishRef.current = onFinish;
+
+  // A hint that is still showing when the stage unmounts must not update it afterwards.
+  useEffect(() => () => clearTimeout(hintTimer.current), []);
 
   usePoseFrames((frame) => {
     if (finishedRef.current) return;

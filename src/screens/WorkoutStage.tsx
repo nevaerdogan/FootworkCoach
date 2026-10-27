@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePoseFrames } from '../components/CameraView';
 import { armDebug, debugInfo, isDebugMode } from '../components/DebugPanel';
 import { Icon } from '../components/Icon';
@@ -65,6 +65,7 @@ export function WorkoutStage({ baseline, workout, onComplete }: Props) {
   const barRef = useRef<HTMLElement>(null);
   const startedRef = useRef(false);
   const finishedRef = useRef(false);
+  const finishTimer = useRef(0);
   const lastSecondRef = useRef<number | null>(null);
   const lostSinceRef = useRef<number | null>(null);
   const feetLostRef = useRef(false);
@@ -72,6 +73,9 @@ export function WorkoutStage({ baseline, workout, onComplete }: Props) {
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
   const debug = useMemo(isDebugMode, []);
+
+  // Leaving the stage during the finish delay must not open the results afterwards.
+  useEffect(() => () => clearTimeout(finishTimer.current), []);
 
   const blockName = (i: number) => workout.blocks[i]?.name ?? '';
 
@@ -83,7 +87,7 @@ export function WorkoutStage({ baseline, workout, onComplete }: Props) {
       bell();
       say('Workout complete. Great work.');
     }
-    setTimeout(() => onCompleteRef.current(session.result()), early ? 0 : 900);
+    finishTimer.current = window.setTimeout(() => onCompleteRef.current(session.result()), early ? 0 : 900);
   };
 
   usePoseFrames((frame) => {

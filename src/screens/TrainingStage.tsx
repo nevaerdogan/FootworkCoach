@@ -47,9 +47,13 @@ export function TrainingStage({ baseline, combination, onComplete }: Props) {
   const lostSinceRef = useRef<number | null>(null);
   const feetLostRef = useRef(false);
   const finishingRef = useRef(false);
+  const finishTimer = useRef(0);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
   const debug = useMemo(isDebugMode, []);
+
+  // Leaving the stage during the finish delay must not open the results afterwards.
+  useEffect(() => () => clearTimeout(finishTimer.current), []);
 
   usePoseFrames((frame) => {
     const now = frame?.timestamp ?? performance.now();
@@ -82,7 +86,7 @@ export function TrainingStage({ baseline, combination, onComplete }: Props) {
       setFeedback(rec);
       if (session.done && !finishingRef.current) {
         finishingRef.current = true;
-        setTimeout(() => onCompleteRef.current(session.result()), TRAINING_CONFIG.finishDelayMs);
+        finishTimer.current = window.setTimeout(() => onCompleteRef.current(session.result()), TRAINING_CONFIG.finishDelayMs);
       }
     }
     if (timeRef.current) timeRef.current.textContent = fmtTime(now - session.result().startTime);

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePoseFrames } from '../components/CameraView';
 import { Icon } from '../components/Icon';
 import { RepDial, setDial } from '../components/RepDial';
@@ -66,9 +66,19 @@ export function IntervalStage({ plan, onComplete }: Props) {
   const lostSinceRef = useRef<number | null>(null);
   const warningRef = useRef<Tracking>('ok');
   const hintTimer = useRef(0);
+  const finishTimer = useRef(0);
   const counts = useRef({ blockReps: 0, blockPartials: 0, total: 0, lastBlock: null as View['lastBlock'] });
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
+
+  // Leaving the stage must not fire a pending hint or open the results afterwards.
+  useEffect(
+    () => () => {
+      clearTimeout(hintTimer.current);
+      clearTimeout(finishTimer.current);
+    },
+    [],
+  );
 
   const finish = (t: number, early: boolean) => {
     if (finishedRef.current) return;
@@ -78,7 +88,7 @@ export function IntervalStage({ plan, onComplete }: Props) {
       bell();
       say('Workout complete. Great work.');
     }
-    setTimeout(() => onCompleteRef.current(session.result()), early ? 0 : 900);
+    finishTimer.current = window.setTimeout(() => onCompleteRef.current(session.result()), early ? 0 : 900);
   };
 
   usePoseFrames((frame) => {
