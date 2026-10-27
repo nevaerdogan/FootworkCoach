@@ -14,6 +14,12 @@ export function useWakeLock() {
     let active = true;
     const acquire = async () => {
       if (!active || document.visibilityState !== 'visible') return;
+      // Browsers release the lock when the tab hides; drop our handle before asking again so
+      // every acquired sentinel is also the one we release.
+      const old = sentinel;
+      sentinel = null;
+      await old?.release().catch(() => {});
+      if (!active) return;
       try {
         sentinel = await wakeLock.request('screen');
       } catch {
