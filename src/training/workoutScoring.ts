@@ -1,3 +1,4 @@
+import { clamp01 } from '../math';
 import { WORKOUT_CONFIG } from '../config';
 import { MOVEMENTS, type MovementId } from '../movements';
 import type { Feedback } from './scoring';
@@ -36,7 +37,6 @@ export interface WorkoutScore {
   feedback: Feedback[];
 }
 
-const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
 const C = WORKOUT_CONFIG;
 
 /**

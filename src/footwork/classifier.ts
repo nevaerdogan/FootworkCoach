@@ -1,3 +1,4 @@
+import { clamp01 } from '../math';
 import { FOOTWORK_CONFIG } from '../config';
 import { STEP_MOVEMENTS, type MovementDefinition, type MovementId } from '../movements';
 import type { BodyVec } from './normalization';
@@ -64,4 +65,3 @@ export function classifyDisplacement(
   };
 }
 
-export const clamp01 = (x: number) => Math.max(0, Math.min(1, x));

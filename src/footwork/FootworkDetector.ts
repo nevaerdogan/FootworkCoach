@@ -1,9 +1,10 @@
+import { clamp01 } from '../math';
 import { FOOTWORK_CONFIG } from '../config';
 import { MOVEMENT_LIST, type MovementDefinition } from '../movements';
 import { isLandmarkVisible } from '../pose/readiness';
 import type { PoseFrame } from '../pose/types';
 import type { BaselineState } from './baseline';
-import { clamp01, classifyDisplacement, type Classification } from './classifier';
+import { classifyDisplacement, type Classification } from './classifier';
 import { angleDelta, bodyYaw, classifyPivot, combinedRotation, YawSmoother, type BodyYaw } from './PivotDetector';
 import { bodyPoints, mid, type Vec2 } from './geometry';
 import type { BodyVec } from './normalization';

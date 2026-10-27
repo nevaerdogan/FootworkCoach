@@ -1,3 +1,4 @@
+import { clamp01 } from '../math';
 import { SCORING_CONFIG, TRAINING_CONFIG } from '../config';
 import type { DetectedMovement } from '../footwork/FootworkDetector';
 import { firstFootSide, MOVEMENTS, stanceAt, type MovementId } from '../movements';
@@ -47,7 +48,6 @@ export interface SessionScore {
 }
 
 const C = SCORING_CONFIG;
-const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
 /** Anatomical lead foot for move `index`: the configured stance, flipped by every switch or shift before it. */
 const leadFootAt = (combination: MovementId[], index: number): 'left' | 'right' =>
   stanceAt(combination, index, TRAINING_CONFIG.stance) === 'orthodox' ? 'left' : 'right';

@@ -8,10 +8,11 @@
  * stay roughly in place. This is an approximation, not professional pivot analysis;
  * all thresholds live in FOOTWORK_CONFIG.
  */
+import { clamp01 } from '../math';
 import { FOOTWORK_CONFIG } from '../config';
 import { PIVOT_MOVEMENTS, type MovementDefinition } from '../movements';
 import type { PoseFrame, WorldPoint } from '../pose/types';
-import { clamp01, type Classification } from './classifier';
+import type { Classification } from './classifier';
 
 export interface BodyYaw {
   /** Degrees. 0 = square to the camera; + = turned toward the user's left (counter-clockwise from above). */

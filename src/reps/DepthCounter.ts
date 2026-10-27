@@ -82,4 +82,3 @@ export abstract class DepthCounter implements ExerciseCounter {
   }
 }
 
-export const clamp01 = (x: number) => Math.max(0, Math.min(1, x));

@@ -8,6 +8,7 @@
  *   angles/yaw (deg) + = counter-clockwise seen from above = turning toward the fighter's left.
  * These match the detector's body-space convention (lateral, forward, rotation).
  */
+import { clamp01 } from '../math';
 import type { Stance } from '../config';
 import { firstFootSide, MOVEMENTS, otherStance, punchArmSide, type MovementId } from '../movements';
 
@@ -155,7 +156,6 @@ export function buildTimeline(combination: MovementId[], stance: Stance): Timeli
   return { steps, totalMs: t };
 }
 
-const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
 export const easeInOut = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 const window01 = (p: number, [a, b]: readonly [number, number]) => clamp01((p - a) / (b - a));
 

@@ -7,9 +7,10 @@
  * floor line, so flexing the arms while standing never counts. Form is judged but never blocks a
  * rep: sagging or piked hips produce a hint.
  */
+import { clamp01 } from '../math';
 import { REP_CONFIG } from '../config';
 import type { PoseFrame } from '../pose/types';
-import { clamp01, DepthCounter, type Measurement } from './DepthCounter';
+import { DepthCounter, type Measurement } from './DepthCounter';
 import { angleAt, inclineDeg, joint, jointVec, type Side } from './geometry';
 import type { RepEvent } from './RepCounter';
 

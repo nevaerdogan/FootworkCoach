@@ -6,9 +6,10 @@
  * the torso line does not. Crunches that lift the shoulders only a little are reported as partial.
  * The legs must stay on the floor, so bending forward while standing never counts.
  */
+import { clamp01 } from '../math';
 import { REP_CONFIG } from '../config';
 import type { PoseFrame } from '../pose/types';
-import { clamp01, DepthCounter, type Measurement } from './DepthCounter';
+import { DepthCounter, type Measurement } from './DepthCounter';
 import { inclineDeg, joint, jointVec, type Side } from './geometry';
 import type { RepEvent } from './RepCounter';
 

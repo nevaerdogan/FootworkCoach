@@ -14,10 +14,10 @@
  * One punch at a time; the arm that moved most decides jab vs cross. Lead arm → JAB, rear → CROSS.
  * Judges reach and timing only, not punching technique.
  */
+import { clamp01 } from '../math';
 import { PUNCH_CONFIG, TRAINING_CONFIG, type Stance } from '../config';
 import type { MovementId } from '../movements';
 import type { PoseFrame, WorldPoint } from '../pose/types';
-import { clamp01 } from './classifier';
 import type { DetectedMovement } from './FootworkDetector';
 import { bodyPoints } from './geometry';
 import { angleDelta, bodyYaw } from './PivotDetector';
